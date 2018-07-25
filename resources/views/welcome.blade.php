@@ -23,9 +23,9 @@
         {{--@endforeach--}}
     {{--</div>--}}
     <div id="welcome">
-        <div id="logo" data-logo="[{first: 'E', full: 'ugene'}, {first: 'B', full: 'atyukov'}, {first: 'S', full: 'tudio'}]">
-            EBS
-        </div>
+        <h1 id="logo">
+            Eugene Batyukov Studio
+        </h1>
         <div id="row">
             @foreach(range(1, 5) as $item)
                 <div>
