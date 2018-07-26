@@ -43,6 +43,12 @@
                         <a class="dropdown-item" href="{{ url('/translations/ui') }}">Языковые переменные</a>
                     </div>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('test') }}" >
+                        Тестовые данные для переводов
+                    </a>
+                </li>
                 <li class="nav-item dropdown">
                     <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                         {{ Auth::user()->f_name }} <span class="caret"></span>

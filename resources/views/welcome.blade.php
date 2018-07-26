@@ -22,10 +22,60 @@
         {{--</div>--}}
         {{--@endforeach--}}
     {{--</div>--}}
+    <style id="js-style-logo">
+
+        /*@keyframes logo__0 {*/
+            /*from {*/
+                /*top: 0;*/
+                /*left: 0px;*/
+            /*}*/
+
+            /*50% {*/
+                /*top: 30px;*/
+                /*left: 0px;*/
+            /*}*/
+
+            /*to {*/
+                /*top: 30px;*/
+                /*left: -15px;*/
+            /*}*/
+        /*}*/
+
+        /*#logo[data-trigger="0"] #logo__0{*/
+            /*-webkit-animation-name: logo__0;*/
+            /*animation-name: logo__0;*/
+            /*-webkit-animation-duration: .6s;*/
+            /*animation-duration: .6s;*/
+            /*-webkit-animation-fill-mode: both;*/
+            /*animation-fill-mode: both;*/
+        /*}*/
+    </style>
     <div id="welcome">
-        <h1 id="logo">
-            Eugene Batyukov Studio
-        </h1>
+        <a href="#" class="logo">
+            <h1 id="logo" class="logo">
+                Eugene Batyukov Studio
+            </h1>
+        </a>
+        <div id="menu">
+            <ul>
+                <li>
+                    <a href="#">
+                        Работы
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        О нас
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        Контакты
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div id="border" class="border"></div>
         <div id="row">
             @foreach(range(1, 5) as $item)
                 <div>

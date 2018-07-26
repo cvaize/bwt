@@ -120,13 +120,90 @@ body {
   position: fixed;
   top: 4vmin;
   left: 8vmin;
-  font-size: 7vmin;
+  font-size: 6vmin;
   color: black;
-  z-index: 1;
-  line-height: 1;
+  line-height: 1.2;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
+  margin: 0;
+  padding: 0;
+  z-index: 3;
+}
+
+#logo * {
+  position: relative;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+#logo > span {
+  top: 0;
+  left: 0;
+  position: absolute;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.logo__items {
+  opacity: 0;
+  display: none;
+  -webkit-transition: opacity .3s ease-in;
+  transition: opacity .3s ease-in;
+}
+
+.animated.faster {
+  -webkit-animation-duration: 300ms;
+  animation-duration: 300ms;
+}
+
+#menu {
+  position: fixed;
+  left: -50vmin;
+  top: 0;
+  z-index: 2;
+  background: white;
+  width: 50vmin;
+  height: 100%;
+  padding: 30vmin 2vmin 0 8vmin;
+  font-size: 4vmin;
+  -webkit-transition: left .3s ease-in;
+  transition: left .3s ease-in;
+}
+
+#menu ul {
+  margin-left: 0;
+  /* Отступ слева в браузере IE и Opera */
+  padding-left: 0;
+  /* Отступ слева в браузере Firefox, Safari, Chrome */
+}
+
+#menu ul li {
+  list-style-type: none;
+  /* Убираем маркеры */
+  padding-bottom: 3vmin;
+}
+
+a {
+  color: #000;
+}
+
+a:hover,
+a:focus {
+  color: #000;
+}
+
+#border {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  opacity: .6;
+  z-index: 1;
+  display: none;
 }
 

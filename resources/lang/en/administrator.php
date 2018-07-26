@@ -14,4 +14,9 @@ return [
     */
 
     'search'    => 'Search!',
+    'hi'    => 'Hi',
+    'man'    => 'Man',
+    'woman'    => 'Woman',
+    'translator'    => 'Translator',
+    'house'    => 'House',
 ];

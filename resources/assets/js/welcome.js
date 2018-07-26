@@ -3,8 +3,38 @@ window.jQuery = window.$;
 window.jquery = window.$;
 require('jquery-mousewheel');
 require('tocca');
+window._ = require('lodash');
 
 //html2canvas -> Делать снимок и узнавать цвет пикселей для рекурсивной корректировки цвета
+function compareRandom(a, b) {
+    return Math.random() - 0.5;
+}
+$.fn.extend({
+    animateCss: function(animationName, callback) {
+        var animationEnd = (function(el) {
+            var animations = {
+                animation: 'animationend',
+                OAnimation: 'oAnimationEnd',
+                MozAnimation: 'mozAnimationEnd',
+                WebkitAnimation: 'webkitAnimationEnd',
+            };
+
+            for (var t in animations) {
+                if (el.style[t] !== undefined) {
+                    return animations[t];
+                }
+            }
+        })(document.createElement('div'));
+
+        this.addClass('animated ' + animationName).one(animationEnd, function() {
+            $(this).removeClass('animated ' + animationName);
+
+            if (typeof callback === 'function') callback();
+        });
+
+        return this;
+    },
+});
 
 const app = {};
 app.document = $(document);
@@ -25,28 +55,200 @@ app.touch = {
     pageX: 0,
     pageY: 0
 };
+app.menu = {};
+app.menu.s = $('#menu');
+app.border = {};
+app.border.s = $('#border');
 app.logo = {};
 app.logo.position = {top:0, left:0};
 app.logo.centerPosition = {top:0, left:0};
 app.logo.width = 0;
 app.logo.height = 0;
+app.logo.s = $('#logo');
+app.logo.original = app.logo.s.html();
 app.logo.setParameters = function(){
-    let logo = $('#logo');
-    app.logo.position = logo.position();
-    app.logo.width = logo.width();
-    app.logo.height = logo.height();
-    app.logo.centerPosition = {top:(app.logo.position.top+app.logo.height/2), left:(app.logo.position.left+app.logo.width/2)};
+    app.logo.position = app.logo.s.position();
+    app.logo.width = app.logo.s.width();
+    app.logo.height = app.logo.s.height();
+    let widthWindow = $(window).width();
+    app.logo.centerPosition = {top:(app.logo.position.top+app.logo.height + widthWindow/40), left:(app.logo.position.left+app.logo.width + widthWindow/40)};
+    console.log(app.logo.centerPosition);
 };
 function calcHypotenuse(a, b) {
     return(Math.sqrt((a * a) + (b * b)));
 }
+app.logo.containers = [];
+app.logo.state = {
+    current: 0,//Нумерация начинается с 0
+    final: 0,//Нумерация начинается с 0
+    headSteps: 2,//Нумерация начинается с 1
+    timeout: {
+        head: 300,
+        items: 300
+    },
+    aim: 0,
+    transition: 'top .3s ease-in, left .3s ease-in',
+    animationClassIn: 'slideInDown faster',
+    animationClassOut: 'slideOutUp faster',
+    ready: true
+};
+app.logo.initConvert = function(){
+    app.logo.state = {
+        current: 0,//Нумерация начинается с 0
+        final: 0,//Нумерация начинается с 0
+        headSteps: 2,//Нумерация начинается с 1
+        timeout: {
+            head: 300,
+            items: 300
+        },
+        aim: 0,
+        transition: 'top .3s ease-in, left .3s ease-in',
+        animationClassIn: 'slideInDown faster',
+        animationClassOut: 'slideOutUp faster',
+        ready: true
+    };
+    app.logo.containers = [];
+    app.menu.s.css('left', "-"+app.menu.s.css('width'));
+    app.border.s.css('display', 'none');
+    app.logo.s.html(app.logo.original);
+    let text = app.logo.s.text().replace(/(\n)/g, "").replace(/^\s*/, "").replace(/\s*$/, "").split(' ');
+    let gLogoString = "";
+    for(let i = 0; i<text.length; i++){
+        if(app.logo.state.final < (text[i].length - 1 + app.logo.state.headSteps)){
+            app.logo.state.final = (text[i].length - 1 + app.logo.state.headSteps);
+            console.log(app.logo.state.final);
+        }
+        let idLogo = 'logo__'+i;
+        let object = {head:"#"+idLogo, items:[], left:0};
+        gLogoString = gLogoString + "<span id='"+idLogo+"' class='logo' style='transition: none'>";
+        for(let j = 0; j<text[i].length; j++){
+            let id = "logo__"+i+"__"+j;
+            if(j !== 0){object.items.push("#"+id);}
+            let classItem = "logo__items";
+            if(j === 0){
+                classItem = "logo__head"
+            }
+            gLogoString = gLogoString + "<span id='"+id+"' class='logo "+classItem+"'>" + text[i].slice(j,j+1) + "</span>";
+        }
+        app.logo.containers.push(object);
+        gLogoString = gLogoString + "</span>";
+    }
+    app.logo.s.html(gLogoString);
+    let widthOld = null;
+    for(let i = 0; i<app.logo.containers.length; i++){
+        let item = $(app.logo.containers[i].head);
+        if(widthOld){
+            app.logo.containers[i].left = widthOld+i+"px";
+            item.css('left', widthOld+i+"px");
+            widthOld = widthOld + $(app.logo.containers[i].head).width();
+        }else{
+            widthOld = $(app.logo.containers[i].head).width();
+        }
+        item.css('transition', app.logo.state.transition);
+    }
+    app.logo.setParameters();
+
+    for(let i = 0; i<app.logo.containers.length; i++){
+        app.logo.containers[i].items = app.logo.containers[i].items.sort(compareRandom);
+    }
+
+    console.log(app.logo.containers);
+};
+app.logo.recursiveTransform = function(){
+    if(app.logo.state.ready && app.logo.state.current !== app.logo.state.aim){
+        console.log('app.logo.recursiveTransform', app.logo.state.current, app.logo.state.aim);
+        if(app.logo.state.aim > app.logo.state.current){    // Разворачиание логотипа
+            switch (app.logo.state.current){
+                case 0:
+                    for(let i = 0; i<app.logo.containers.length; i++){
+                        let item = $(app.logo.containers[i].head);
+                        item.css('top', item.height()*i);
+                    }
+                    break;
+                case 1:
+                    for(let i = 0; i<app.logo.containers.length; i++){
+                        let item = $(app.logo.containers[i].head);
+                        item.css('top', item.height()*i);
+                        item.css('left', 0);
+                    }
+                    break;
+                default:
+                    let index = app.logo.state.current - app.logo.state.headSteps;
+                        $('.logo__items').css('display', 'block');
+                        for(let i = 0; i<app.logo.containers.length; i++){
+                            let item = $(app.logo.containers[i].items[index]);
+                            item.animateCss(app.logo.state.animationClassIn);
+                            item.css('opacity', '1');
+                        }
+                    break;
+            }
+            if(app.logo.state.current >= 5){
+                app.menu.s.css('left', 0);
+                app.border.s.css('display', 'block');
+            }
+            app.logo.state.current++;
+        }else{                                              // Сворачивание логотипа
+            switch (app.logo.state.current){
+                case 1:
+                    for(let i = 0; i<app.logo.containers.length; i++){
+                        let item = $(app.logo.containers[i].head);
+                        item.css('top', 0);
+                        item.css('left', app.logo.containers[i].left);
+                    }
+                    break;
+                case 2:
+                    $('.logo__items').css('display', 'inline');
+                    for(let i = 0; i<app.logo.containers.length; i++){
+                        let item = $(app.logo.containers[i].head);
+                        item.css('top', item.height()*i);
+                        item.css('left', app.logo.containers[i].left);
+                    }
+                    break;
+                default:
+                    let index = app.logo.state.current - app.logo.state.headSteps - 1;
+                        for(let i = 0; i<app.logo.containers.length; i++){
+                            let item = $(app.logo.containers[i].items[index]);
+                            item.animateCss(app.logo.state.animationClassOut);
+                            item.css('opacity', '0');
+                        }
+                    break;
+            }
+            app.menu.s.css('left', "-"+app.menu.s.css('width'));
+            app.border.s.css('display', 'none');
+            app.logo.state.current--;
+        }
+
+        if(app.logo.state.current < app.logo.state.headSteps){
+            setTimeout(function () {
+                app.logo.state.ready = true;
+                app.logo.recursiveTransform();
+            }, app.logo.state.timeout.head);
+        }else{
+            setTimeout(function () {
+                app.logo.state.ready = true;
+                app.logo.recursiveTransform();
+            }, app.logo.state.timeout.items);
+        }
+        app.logo.state.ready = false;
+    }
+};
 app.logo.transform = function(cursor){
     let x = app.logo.centerPosition.left - cursor.x;
     let y = app.logo.centerPosition.top - cursor.y;
     let hypotenuse = calcHypotenuse(x, y);
-    console.log(hypotenuse);
+    let widthWindow = $(window).width();
+    let hypotenuseChunk = hypotenuse/(widthWindow/60);
+    hypotenuseChunk = hypotenuseChunk - 5;
+    if(hypotenuseChunk <= app.logo.state.final){
+        app.logo.state.aim = Math.round(app.logo.state.final-hypotenuseChunk);
+        console.log(Math.round(app.logo.state.final-hypotenuseChunk));
+        app.logo.recursiveTransform();
+    }else{
+        app.logo.state.aim = 0;
+        app.logo.recursiveTransform();
+    }
 };
-app.logo.setParameters();
+app.logo.initConvert();
 app.setBlocksStartPositionRight = function () {
     let widthBlock = $(app.blocks[0]).width();
     let countBlockOnMainWindow = Math.floor(app.welcome.width()/widthBlock);
@@ -140,7 +342,7 @@ app.init = function(){
         b = 'top';
     }
     app.setBlocksStartPositionRight();
-    app.logo.setParameters();
+    app.logo.initConvert();
     app.blocks.each(function (index, value) {
         let set = app.blocksStartPositionRight + -1*$(value).width()*index;
         // if(index === 0){
@@ -198,6 +400,18 @@ app.bind = function () {
                 }
                 console.log('-webkit-filter');
             }
+        }
+        if(target.hasClass('logo')){
+            if(app.logo.state.current !== app.logo.state.final + 4){
+                event.preventDefault();
+                app.logo.state.aim = app.logo.state.final + 4;
+                app.logo.recursiveTransform();
+            }
+        }
+        if(target.hasClass('border')){
+            event.preventDefault();
+            app.logo.state.aim = 0;
+            app.logo.recursiveTransform();
         }
     });
     // $(document).on('scroll', function () {

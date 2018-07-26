@@ -25,11 +25,12 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
         Gate::define('ltm-admin-translations', function ($user) {
-            return $user && $user->is_admin;
+
+            return $user && $user->isManager();
         });
 
         Gate::define('ltm-bypass-lottery', function ($user) {
-            return $user && ($user->is_admin || $user->is_editor);
+            return $user && ($user->isManager() || $user->isTranslator());
         });
 
         Gate::define(/**

@@ -30,6 +30,15 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    public function isManager(){
+
+        return $this->getEmail() === "manager@gmail.com";
+    }
+
+    public function isTranslator(){
+        return $this->getEmail() === "translator@gmail.com";
+    }
+
     /**
      * @return mixed
      */

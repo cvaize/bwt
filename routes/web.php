@@ -12,11 +12,12 @@
 */
 use Vsch\TranslationManager\Translator;
 
-\Route::group(['middleware' => 'web', 'prefix' => 'translations'], function () {
-    Translator::routes();
-});
 
 Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalization::setLocale(), 'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath' ]], function () {
+
+    \Route::group(['middleware' => 'web', 'prefix' => 'translations'], function () {
+        Translator::routes();
+    });
     Route::get('/', function () {
         return view('welcome');
     });
@@ -41,6 +42,9 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
 
     });
     Auth::routes();
+    Route::get('/test', function (){
+        return view('test');
+    })->name('test');
 
     Route::get('/admin', 'HomeController@index')->name('home');
 });
