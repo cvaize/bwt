@@ -38,23 +38,22 @@ $.fn.extend({
 
 const app = {};
 app.document = $(document);
-app.welcome = $('#welcome');
-app.orientation = false; //true - горизонтально, false - вертикально
-if(app.orientation){
-    app.scroll = $(document).scrollLeft();
-}else{
-    app.scroll = $(document).scrollTop();
-}
+app.orientation = true; //true - горизонтально, false - вертикально
+// if(app.orientation){
+//     app.scroll = $(document).scrollLeft();
+// }else{
+//     app.scroll = $(document).scrollTop();
+// }
 app.row = $('#row');
 app.blocks = $('#row >div');
-app.blocksStartPositionRight = 0;
-app.offsetRow = 0;
-app.scrollMode = 0; // 0 - Мод простого скрола, 1 - мод последовательного скрола
-app.width = 0; //При app.orientation = false; становится height
-app.touch = {
-    pageX: 0,
-    pageY: 0
-};
+// app.blocksStartPositionRight = 0;
+// app.offsetRow = 0;
+// app.scrollMode = 0; // 0 - Мод простого скрола, 1 - мод последовательного скрола
+// app.width = 0; //При app.orientation = false; становится height
+// app.touch = {
+//     pageX: 0,
+//     pageY: 0
+// };
 app.menu = {};
 app.menu.s = $('#menu');
 app.border = {};
@@ -72,7 +71,7 @@ app.logo.setParameters = function(){
     app.logo.height = app.logo.s.height();
     let widthWindow = $(window).width();
     app.logo.centerPosition = {top:(app.logo.position.top+app.logo.height + widthWindow/40), left:(app.logo.position.left+app.logo.width + widthWindow/40)};
-    console.log(app.logo.centerPosition);
+    // console.log(app.logo.centerPosition);
 };
 function calcHypotenuse(a, b) {
     return(Math.sqrt((a * a) + (b * b)));
@@ -83,11 +82,11 @@ app.logo.state = {
     final: 0,//Нумерация начинается с 0
     headSteps: 2,//Нумерация начинается с 1
     timeout: {
-        head: 300,
-        items: 300
+        head: 200,
+        items: 200
     },
     aim: 0,
-    transition: 'top .3s ease-in, left .3s ease-in',
+    transition: 'top .2s ease-in, left .2s ease-in',
     animationClassIn: 'slideInDown faster',
     animationClassOut: 'slideOutUp faster',
     ready: true
@@ -98,11 +97,11 @@ app.logo.initConvert = function(){
         final: 0,//Нумерация начинается с 0
         headSteps: 2,//Нумерация начинается с 1
         timeout: {
-            head: 300,
-            items: 300
+            head: 200,
+            items: 200
         },
         aim: 0,
-        transition: 'top .3s ease-in, left .3s ease-in',
+        transition: 'top .2s ease-in, left .2s ease-in',
         animationClassIn: 'slideInDown faster',
         animationClassOut: 'slideOutUp faster',
         ready: true
@@ -116,7 +115,7 @@ app.logo.initConvert = function(){
     for(let i = 0; i<text.length; i++){
         if(app.logo.state.final < (text[i].length - 1 + app.logo.state.headSteps)){
             app.logo.state.final = (text[i].length - 1 + app.logo.state.headSteps);
-            console.log(app.logo.state.final);
+            // console.log(app.logo.state.final);
         }
         let idLogo = 'logo__'+i;
         let object = {head:"#"+idLogo, items:[], left:0};
@@ -152,11 +151,11 @@ app.logo.initConvert = function(){
         app.logo.containers[i].items = app.logo.containers[i].items.sort(compareRandom);
     }
 
-    console.log(app.logo.containers);
+    // console.log(app.logo.containers);
 };
 app.logo.recursiveTransform = function(){
     if(app.logo.state.ready && app.logo.state.current !== app.logo.state.aim){
-        console.log('app.logo.recursiveTransform', app.logo.state.current, app.logo.state.aim);
+        // console.log('app.logo.recursiveTransform', app.logo.state.current, app.logo.state.aim);
         if(app.logo.state.aim > app.logo.state.current){    // Разворачиание логотипа
             switch (app.logo.state.current){
                 case 0:
@@ -182,9 +181,13 @@ app.logo.recursiveTransform = function(){
                         }
                     break;
             }
-            if(app.logo.state.current >= 5){
-                app.menu.s.css('left', 0);
-                app.border.s.css('display', 'block');
+            if(app.logo.state.current >= 3){
+                let timeout = null;
+                clearTimeout(timeout);
+                timeout = setTimeout(function () {
+                    app.menu.s.css('left', 0);
+                    app.border.s.css('display', 'block');
+                }, 0);
             }
             app.logo.state.current++;
         }else{                                              // Сворачивание логотипа
@@ -213,8 +216,12 @@ app.logo.recursiveTransform = function(){
                         }
                     break;
             }
-            app.menu.s.css('left', "-"+app.menu.s.css('width'));
-            app.border.s.css('display', 'none');
+            let timeout = null;
+            clearTimeout(timeout);
+            timeout = setTimeout(function () {
+                app.menu.s.css('left', "-"+app.menu.s.css('width'));
+                app.border.s.css('display', 'none');
+            }, 0);
             app.logo.state.current--;
         }
 
@@ -237,247 +244,99 @@ app.logo.transform = function(cursor){
     let y = app.logo.centerPosition.top - cursor.y;
     let hypotenuse = calcHypotenuse(x, y);
     let widthWindow = $(window).width();
-    let hypotenuseChunk = hypotenuse/(widthWindow/60);
+    let hypotenuseChunk = hypotenuse/(widthWindow/50);
     hypotenuseChunk = hypotenuseChunk - 5;
     if(hypotenuseChunk <= app.logo.state.final){
         app.logo.state.aim = Math.round(app.logo.state.final-hypotenuseChunk);
-        console.log(Math.round(app.logo.state.final-hypotenuseChunk));
+        // console.log(Math.round(app.logo.state.final-hypotenuseChunk));
         app.logo.recursiveTransform();
     }else{
         app.logo.state.aim = 0;
         app.logo.recursiveTransform();
     }
 };
-app.logo.initConvert();
-app.setBlocksStartPositionRight = function () {
-    let widthBlock = $(app.blocks[0]).width();
-    let countBlockOnMainWindow = Math.floor(app.welcome.width()/widthBlock);
-    app.blocksStartPositionRight = widthBlock * countBlockOnMainWindow - widthBlock;
-};
-app.changeWidth = function () {
-    let element = $(app.blocks[app.blocks.length - 1]);
-    if(app.orientation){
-        app.width = $(element[0]).position().left + element.width();
-    }else{
-        app.width = $(element[0]).position().top + element.height();
-    }
-};
-app.setOffsetRow = function (val) {
-    let r = 'left';
-    let t = 'top';
-    if(!app.orientation){ r = 'top'; t = 'left';}
-    app.offsetRow = val;
-    app.row.css(r, val+"px");
-    app.row.css(t, "auto");
-
-};
 app.changeOrientation = function () {
-    let saveOrientation = app.orientation;
-    if($(app.blocks[0]).width() === app.welcome.width()){
+    if($(app.blocks[0]).width() === app.document.width()){
         app.orientation = false;
+        $('html, body').css('overflow', 'auto');
+        app.row.addClass('js-column');
     }else{
         app.orientation = true;
-    }
-    if(saveOrientation !== app.orientation){
-        app.setOffsetRow(0);
-    }
-};
-app.changeOrientation();
-app.blocksBlurChank = 10;
-app.changeMouseHoverBlock = function (x, y) {
-    if(app.orientation){
-        let r = 30;
-        let widthBlock = $(app.blocks[0]).width()/r;
-        app.blocks.each(function (index, value) {
-            let blur = ($(value).position().left - x)/widthBlock;
-            if(blur < 0){
-                blur = (($(value).position().left + widthBlock*r) - x)/widthBlock;
-                if(blur < 0){
-                    blur = -1*blur;
-                }
-            }
-            if(blur > app.blocksBlurChank){
-                blur = app.blocksBlurChank;
-            }
-            $(value).find('.img-blur').css("filter", "blur("+blur+"px)");
-            $(value).find('.img-blur').css("-webkit-filter", "blur("+blur+"px)");
-        });
-    }else{
-        app.blocks.find('.img-blur').css("filter", "blur("+app.blocksBlurChank+"px)");
-        app.blocks.find('.img-blur').css("-webkit-filter", "blur("+app.blocksBlurChank+"px)");
+        $('html, body').css('overflow', 'hidden');
+        app.row.removeClass('js-column');
     }
 };
-app.setScroll = function(val){
 
-    let width = app.welcome.width();
-    if(!app.orientation){ width = app.welcome.height(); }
-    console.log('setScroll - 1',val);
-    if(val > (app.width - width)){
-        val = (app.width - width);
-    }
-    if(val < 0){ val = 0; }
-    console.log('setScroll - 2',val);
-    app.scroll = val;
+app.setBlurBlock = function (elements) {
+    elements.find('text').css('opacity', 1);
+    setTimeout(()=>{
+        elements.addClass('active');
+    }, 300);
+    let newElements = elements.find('feGaussianBlur');
+    let deviation = 0;
+    let fun = ()=>{
+        let val = 5*(Math.sin(deviation+=0.1)+1);
+        newElements.attr('stdDeviation', val);
+        if(val <= 9){
+            setTimeout(fun, 0);
+        }else{
+            newElements.attr('stdDeviation', 10);
+        }
+    };
+    setTimeout(fun, 0);
+};
 
-    if(app.scrollMode === 0){
-        app.setOffsetRow(-1*val);
-    }
-    if(app.scrollMode === 1){
-        let widthBlock = $(app.blocks[0]).width();
-        app.setOffsetRow(-1*Math.ceil(val/widthBlock) * widthBlock);
-    }
-    // app.document.scrollLeft(val);
+app.unSetBlurBlock = function (elements) {
+    elements.find('text').css('opacity', 0);
+    setTimeout(()=>{
+        elements.removeClass('active');
+    }, 300);
+    let newElements = elements.find('feGaussianBlur');
+    let deviation = 10;
+    let fun = ()=>{
+        let val = 5*(Math.sin(deviation+=0.1)+1);
+        newElements.attr('stdDeviation', val);
+        if(val > 1){
+            setTimeout(fun, 0);
+        }else{
+            newElements.attr('stdDeviation', 0);
+        }
+    };
+    setTimeout(fun, 0);
 };
 app.init = function(){
     app.changeOrientation();
-    let r = 'right';
-    let t = 'top';
-    let l = 'left';
-    let b = 'bottom';
-
-    if(!app.orientation){
-        r = 'bottom';
-        t = 'right';
-        l = 'left';
-        b = 'top';
-    }
-    app.setBlocksStartPositionRight();
     app.logo.initConvert();
-    app.blocks.each(function (index, value) {
-        let set = app.blocksStartPositionRight + -1*$(value).width()*index;
-        // if(index === 0){
-        //     set = app.blocksStartPositionRight;
-        // }
-        if(!app.orientation){
-            set = -1*$(value).height()*index;
-        }
-        $(value).css(r, set);
-        $(value).css(t, 0);
-        $(value).css(l, 'auto');
-        $(value).css(b, 'auto');
-    });
-    app.changeWidth();
 };
 app.bind = function () {
-    // let scroll = app.scroll;
-    $(document).on('mousewheel', function(event) {
-        console.log(event.deltaX, event.deltaY, event.deltaFactor);
-        app.setScroll(app.scroll + event.deltaY*event.deltaFactor);
-    });
     $(document).on('mousemove', function(e){
         let X = e.pageX; // положения по оси X
         let Y = e.pageY; // положения по оси Y
-        // console.log("X: " + X + " Y: " + Y); // вывод результата в консоль
-        app.changeMouseHoverBlock(X, Y);
         app.logo.transform({x:X, y:Y});
     });
-    $(document).on('click', function(event) {
-        let target = $(event.target);
-        //Отслеживание blur и активация ссылок после снятия blur
-        if(target.hasClass('img-blur__link') || target.hasClass('img-blur')){
-            // console.log(target.parent('.img-blur__link'));
-            target = (target.hasClass('img-blur'))? target: target.find('.img-blur');
-
-            let blur = target.css('filter');
-            let blurW = target.css('-webkit-filter');
-
-            let images = $('.img-blur');
-            images.css("filter", "blur("+app.blocksBlurChank+"px)");
-            images.css("-webkit-filter", "blur("+app.blocksBlurChank+"px)");
-
-            target.css("filter", blur);
-            target.css("-webkit-filter", blurW);
-
-            if(target.css('filter')){
-                if(target.css('filter') !== 'none' && target.css('filter') !== 'blur(0px)'){
-                    event.preventDefault();
-                    target.attr("data-blur", 0);
-                }
-            }else if(target.css('-webkit-filter')){
-                if(target.css('-webkit-filter') !== 'none' && target.css('-webkit-filter') !== 'blur(0px)'){
-                    event.preventDefault();
-                    target.attr("data-blur", 0);
-                }
-                console.log('-webkit-filter');
-            }
-        }
-        if(target.hasClass('logo')){
-            if(app.logo.state.current !== app.logo.state.final + 4){
-                event.preventDefault();
-                app.logo.state.aim = app.logo.state.final + 4;
-                app.logo.recursiveTransform();
-            }
-        }
-        if(target.hasClass('border')){
+    $('.img-blur__link').on('click', function(event) {
+        let img = $(this).find('.img-blur');
+        if(!img.hasClass('active')){
             event.preventDefault();
-            app.logo.state.aim = 0;
+            app.setBlurBlock(img);
+        }
+    });
+    $('.logo').on('click', function(event) {
+        if(app.logo.state.current !== app.logo.state.final + 4){
+            event.preventDefault();
+            app.logo.state.aim = app.logo.state.final + 4;
             app.logo.recursiveTransform();
         }
     });
-    // $(document).on('scroll', function () {
-    //     if(app.orientation){
-    //         scroll = app.document.scrollLeft();
-    //     }else{
-    //         scroll = app.document.scrollTop();
-    //     }
-    //
-    //     app.setScroll(scroll);
-    //     console.log('scroll',scroll);
-    // });
-    // $(document).on('swipeup',function (e,data){
-    //     console.log('swipeup');
-    //     console.log(data.x);
-    //     console.log(data.y);
-    //     console.log(data.distance.x);
-    //     console.log(data.distance.y);
-    // });
-    // $(document).on('swipedown',function (e,data){
-    //     console.log('swipedown');
-    //     console.log(data.x);
-    //     console.log(data.y);
-    //     console.log(data.distance.x);
-    //     console.log(data.distance.y);
-    // });
-    // $(document).on('swipeleft',function (e,data){
-    //     console.log('swipeleft');
-    //     console.log(data.x);
-    //     console.log(data.y);
-    //     console.log(data.distance.x);
-    //     console.log(data.distance.y);
-    // });
-    // $(document).on('swiperight',function (e,data){
-    //     console.log('swiperight');
-    //     console.log(data.x);
-    //     console.log(data.y);
-    //     console.log(data.distance.x);
-    //     console.log(data.distance.y);
-    // });
-    $(document).on('touchend', function(e) {
-        console.log('touchend');
-        app.touch.pageX = 0;
-        app.touch.pageY = 0;
+    $('.border').on('click', function(event) {
+        event.preventDefault();
+        app.logo.state.aim = 0;
+        app.logo.recursiveTransform();
     });
-    $(document).on('touchstart', function(e) {
-        console.log('touchstart');
-        app.touch.pageX = 0;
-        app.touch.pageY = 0;
-    });
-    $(document).on('touchmove', function(e) {
-        let touch = e.touches[0];
-        console.log('touchmove',touch.pageX + " - " + touch.pageY);
-        if(app.touch.pageX === 0){
-            app.touch.pageX = touch.pageX;
-        }
-        if(app.touch.pageY === 0){
-            app.touch.pageY = touch.pageY;
-        }
-        if(app.orientation){
-            app.setScroll(app.scroll + -1*(touch.pageX - app.touch.pageX));
-        }else{
-            app.setScroll(app.scroll + -1*(touch.pageY - app.touch.pageY));
-        }
-        app.touch.pageX = touch.pageX;
-        app.touch.pageY = touch.pageY;
+    $('.img-blur').hover(function () {
+        app.setBlurBlock($(this));
+    }, function () {
+        app.unSetBlurBlock($(this));
     });
     let timeout = null;
     $(window).resize(function() {
