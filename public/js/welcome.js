@@ -60,386 +60,11 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
-/* 0 */,
-/* 1 */,
-/* 2 */,
-/* 3 */,
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(5);
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-window.$ = __webpack_require__(11);
-window.jQuery = window.$;
-window.jquery = window.$;
-__webpack_require__(12);
-__webpack_require__(13);
-window._ = __webpack_require__(14);
-
-//html2canvas -> Делать снимок и узнавать цвет пикселей для рекурсивной корректировки цвета
-function compareRandom(a, b) {
-    return Math.random() - 0.5;
-}
-$.fn.extend({
-    animateCss: function animateCss(animationName, callback) {
-        var animationEnd = function (el) {
-            var animations = {
-                animation: 'animationend',
-                OAnimation: 'oAnimationEnd',
-                MozAnimation: 'mozAnimationEnd',
-                WebkitAnimation: 'webkitAnimationEnd'
-            };
-
-            for (var t in animations) {
-                if (el.style[t] !== undefined) {
-                    return animations[t];
-                }
-            }
-        }(document.createElement('div'));
-
-        this.addClass('animated ' + animationName).one(animationEnd, function () {
-            $(this).removeClass('animated ' + animationName);
-
-            if (typeof callback === 'function') callback();
-        });
-
-        return this;
-    }
-});
-
-var app = {};
-app.document = $(document);
-app.orientation = true; //true - горизонтально, false - вертикально
-// if(app.orientation){
-//     app.scroll = $(document).scrollLeft();
-// }else{
-//     app.scroll = $(document).scrollTop();
-// }
-app.row = $('#row');
-app.blocks = $('#row >div');
-// app.blocksStartPositionRight = 0;
-// app.offsetRow = 0;
-// app.scrollMode = 0; // 0 - Мод простого скрола, 1 - мод последовательного скрола
-// app.width = 0; //При app.orientation = false; становится height
-// app.touch = {
-//     pageX: 0,
-//     pageY: 0
-// };
-app.menu = {};
-app.menu.s = $('#menu');
-app.border = {};
-app.border.s = $('#border');
-app.logo = {};
-app.logo.position = { top: 0, left: 0 };
-app.logo.centerPosition = { top: 0, left: 0 };
-app.logo.width = 0;
-app.logo.height = 0;
-app.logo.s = $('#logo');
-app.logo.original = app.logo.s.html();
-app.logo.setParameters = function () {
-    app.logo.position = app.logo.s.position();
-    app.logo.width = app.logo.s.width();
-    app.logo.height = app.logo.s.height();
-    var widthWindow = $(window).width();
-    app.logo.centerPosition = { top: app.logo.position.top + app.logo.height + widthWindow / 40, left: app.logo.position.left + app.logo.width + widthWindow / 40 };
-    // console.log(app.logo.centerPosition);
-};
-function calcHypotenuse(a, b) {
-    return Math.sqrt(a * a + b * b);
-}
-app.logo.containers = [];
-app.logo.state = {
-    current: 0, //Нумерация начинается с 0
-    final: 0, //Нумерация начинается с 0
-    headSteps: 2, //Нумерация начинается с 1
-    timeout: {
-        head: 200,
-        items: 200
-    },
-    aim: 0,
-    transition: 'top .2s ease-in, left .2s ease-in',
-    animationClassIn: 'slideInDown faster',
-    animationClassOut: 'slideOutUp faster',
-    ready: true
-};
-app.logo.initConvert = function () {
-    app.logo.state = {
-        current: 0, //Нумерация начинается с 0
-        final: 0, //Нумерация начинается с 0
-        headSteps: 2, //Нумерация начинается с 1
-        timeout: {
-            head: 200,
-            items: 200
-        },
-        aim: 0,
-        transition: 'top .2s ease-in, left .2s ease-in',
-        animationClassIn: 'slideInDown faster',
-        animationClassOut: 'slideOutUp faster',
-        ready: true
-    };
-    app.logo.containers = [];
-    app.menu.s.css('left', "-" + app.menu.s.css('width'));
-    app.border.s.css('display', 'none');
-    app.logo.s.html(app.logo.original);
-    var text = app.logo.s.text().replace(/(\n)/g, "").replace(/^\s*/, "").replace(/\s*$/, "").split(' ');
-    var gLogoString = "";
-    for (var i = 0; i < text.length; i++) {
-        if (app.logo.state.final < text[i].length - 1 + app.logo.state.headSteps) {
-            app.logo.state.final = text[i].length - 1 + app.logo.state.headSteps;
-            // console.log(app.logo.state.final);
-        }
-        var idLogo = 'logo__' + i;
-        var object = { head: "#" + idLogo, items: [], left: 0 };
-        gLogoString = gLogoString + "<span id='" + idLogo + "' class='logo' style='transition: none'>";
-        for (var j = 0; j < text[i].length; j++) {
-            var id = "logo__" + i + "__" + j;
-            if (j !== 0) {
-                object.items.push("#" + id);
-            }
-            var classItem = "logo__items";
-            if (j === 0) {
-                classItem = "logo__head";
-            }
-            gLogoString = gLogoString + "<span id='" + id + "' class='logo " + classItem + "'>" + text[i].slice(j, j + 1) + "</span>";
-        }
-        app.logo.containers.push(object);
-        gLogoString = gLogoString + "</span>";
-    }
-    app.logo.s.html(gLogoString);
-    var widthOld = null;
-    for (var _i = 0; _i < app.logo.containers.length; _i++) {
-        var item = $(app.logo.containers[_i].head);
-        if (widthOld) {
-            app.logo.containers[_i].left = widthOld + _i + "px";
-            item.css('left', widthOld + _i + "px");
-            widthOld = widthOld + $(app.logo.containers[_i].head).width();
-        } else {
-            widthOld = $(app.logo.containers[_i].head).width();
-        }
-        item.css('transition', app.logo.state.transition);
-    }
-    app.logo.setParameters();
-
-    for (var _i2 = 0; _i2 < app.logo.containers.length; _i2++) {
-        app.logo.containers[_i2].items = app.logo.containers[_i2].items.sort(compareRandom);
-    }
-
-    // console.log(app.logo.containers);
-};
-app.logo.recursiveTransform = function () {
-    if (app.logo.state.ready && app.logo.state.current !== app.logo.state.aim) {
-        // console.log('app.logo.recursiveTransform', app.logo.state.current, app.logo.state.aim);
-        if (app.logo.state.aim > app.logo.state.current) {
-            // Разворачиание логотипа
-            switch (app.logo.state.current) {
-                case 0:
-                    for (var i = 0; i < app.logo.containers.length; i++) {
-                        var item = $(app.logo.containers[i].head);
-                        item.css('top', item.height() * i);
-                    }
-                    break;
-                case 1:
-                    for (var _i3 = 0; _i3 < app.logo.containers.length; _i3++) {
-                        var _item = $(app.logo.containers[_i3].head);
-                        _item.css('top', _item.height() * _i3);
-                        _item.css('left', 0);
-                    }
-                    break;
-                default:
-                    var index = app.logo.state.current - app.logo.state.headSteps;
-                    $('.logo__items').css('display', 'block');
-                    for (var _i4 = 0; _i4 < app.logo.containers.length; _i4++) {
-                        var _item2 = $(app.logo.containers[_i4].items[index]);
-                        _item2.animateCss(app.logo.state.animationClassIn);
-                        _item2.css('opacity', '1');
-                    }
-                    break;
-            }
-            if (app.logo.state.current >= 3) {
-                var timeout = null;
-                clearTimeout(timeout);
-                timeout = setTimeout(function () {
-                    app.menu.s.css('left', 0);
-                    app.border.s.css('display', 'block');
-                }, 0);
-            }
-            app.logo.state.current++;
-        } else {
-            // Сворачивание логотипа
-            switch (app.logo.state.current) {
-                case 1:
-                    for (var _i5 = 0; _i5 < app.logo.containers.length; _i5++) {
-                        var _item3 = $(app.logo.containers[_i5].head);
-                        _item3.css('top', 0);
-                        _item3.css('left', app.logo.containers[_i5].left);
-                    }
-                    break;
-                case 2:
-                    $('.logo__items').css('display', 'inline');
-                    for (var _i6 = 0; _i6 < app.logo.containers.length; _i6++) {
-                        var _item4 = $(app.logo.containers[_i6].head);
-                        _item4.css('top', _item4.height() * _i6);
-                        _item4.css('left', app.logo.containers[_i6].left);
-                    }
-                    break;
-                default:
-                    var _index = app.logo.state.current - app.logo.state.headSteps - 1;
-                    for (var _i7 = 0; _i7 < app.logo.containers.length; _i7++) {
-                        var _item5 = $(app.logo.containers[_i7].items[_index]);
-                        _item5.animateCss(app.logo.state.animationClassOut);
-                        _item5.css('opacity', '0');
-                    }
-                    break;
-            }
-            var _timeout = null;
-            clearTimeout(_timeout);
-            _timeout = setTimeout(function () {
-                app.menu.s.css('left', "-" + app.menu.s.css('width'));
-                app.border.s.css('display', 'none');
-            }, 0);
-            app.logo.state.current--;
-        }
-
-        if (app.logo.state.current < app.logo.state.headSteps) {
-            setTimeout(function () {
-                app.logo.state.ready = true;
-                app.logo.recursiveTransform();
-            }, app.logo.state.timeout.head);
-        } else {
-            setTimeout(function () {
-                app.logo.state.ready = true;
-                app.logo.recursiveTransform();
-            }, app.logo.state.timeout.items);
-        }
-        app.logo.state.ready = false;
-    }
-};
-app.logo.transform = function (cursor) {
-    var x = app.logo.centerPosition.left - cursor.x;
-    var y = app.logo.centerPosition.top - cursor.y;
-    var hypotenuse = calcHypotenuse(x, y);
-    var widthWindow = $(window).width();
-    var hypotenuseChunk = hypotenuse / (widthWindow / 50);
-    hypotenuseChunk = hypotenuseChunk - 5;
-    if (hypotenuseChunk <= app.logo.state.final) {
-        app.logo.state.aim = Math.round(app.logo.state.final - hypotenuseChunk);
-        // console.log(Math.round(app.logo.state.final-hypotenuseChunk));
-        app.logo.recursiveTransform();
-    } else {
-        app.logo.state.aim = 0;
-        app.logo.recursiveTransform();
-    }
-};
-app.changeOrientation = function () {
-    if ($(app.blocks[0]).width() === app.document.width()) {
-        app.orientation = false;
-        $('html, body').css('overflow', 'auto');
-        app.row.addClass('js-column');
-    } else {
-        app.orientation = true;
-        $('html, body').css('overflow', 'hidden');
-        app.row.removeClass('js-column');
-    }
-};
-
-app.setBlurBlock = function (elements) {
-    elements.find('text').css('opacity', 1);
-    setTimeout(function () {
-        elements.addClass('active');
-    }, 300);
-    var newElements = elements.find('feGaussianBlur');
-    var deviation = 0;
-    var fun = function fun() {
-        var val = 5 * (Math.sin(deviation += 0.1) + 1);
-        newElements.attr('stdDeviation', val);
-        if (val <= 9) {
-            setTimeout(fun, 0);
-        } else {
-            newElements.attr('stdDeviation', 10);
-        }
-    };
-    setTimeout(fun, 0);
-};
-
-app.unSetBlurBlock = function (elements) {
-    elements.find('text').css('opacity', 0);
-    setTimeout(function () {
-        elements.removeClass('active');
-    }, 300);
-    var newElements = elements.find('feGaussianBlur');
-    var deviation = 10;
-    var fun = function fun() {
-        var val = 5 * (Math.sin(deviation += 0.1) + 1);
-        newElements.attr('stdDeviation', val);
-        if (val > 1) {
-            setTimeout(fun, 0);
-        } else {
-            newElements.attr('stdDeviation', 0);
-        }
-    };
-    setTimeout(fun, 0);
-};
-app.init = function () {
-    app.changeOrientation();
-    app.logo.initConvert();
-};
-app.bind = function () {
-    $(document).on('mousemove', function (e) {
-        var X = e.pageX; // положения по оси X
-        var Y = e.pageY; // положения по оси Y
-        app.logo.transform({ x: X, y: Y });
-    });
-    $('.img-blur__link').on('click', function (event) {
-        var img = $(this).find('.img-blur');
-        if (!img.hasClass('active')) {
-            event.preventDefault();
-            app.setBlurBlock(img);
-        }
-    });
-    $('.logo').on('click', function (event) {
-        if (app.logo.state.current !== app.logo.state.final + 4) {
-            event.preventDefault();
-            app.logo.state.aim = app.logo.state.final + 4;
-            app.logo.recursiveTransform();
-        }
-    });
-    $('.border').on('click', function (event) {
-        event.preventDefault();
-        app.logo.state.aim = 0;
-        app.logo.recursiveTransform();
-    });
-    $('.img-blur').hover(function () {
-        app.setBlurBlock($(this));
-    }, function () {
-        app.unSetBlurBlock($(this));
-    });
-    var timeout = null;
-    $(window).resize(function () {
-        clearTimeout(timeout);
-        timeout = setTimeout(function () {
-            app.init();
-        }, 500);
-    });
-};
-app.bind();
-app.init();
-
-/***/ }),
-/* 6 */,
-/* 7 */,
-/* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */
+/* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -10810,7 +10435,420 @@ return jQuery;
 
 
 /***/ }),
-/* 12 */
+/* 1 */,
+/* 2 */,
+/* 3 */,
+/* 4 */,
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(6);
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+window.$ = __webpack_require__(0);
+window.jQuery = window.$;
+window.jquery = window.$;
+__webpack_require__(7);
+__webpack_require__(8);
+window._ = __webpack_require__(9);
+
+//html2canvas -> Делать снимок и узнавать цвет пикселей для рекурсивной корректировки цвета
+function compareRandom(a, b) {
+    return Math.random() - 0.5;
+}
+$.fn.extend({
+    animateCss: function animateCss(animationName, callback) {
+        var animationEnd = function (el) {
+            var animations = {
+                animation: 'animationend',
+                OAnimation: 'oAnimationEnd',
+                MozAnimation: 'mozAnimationEnd',
+                WebkitAnimation: 'webkitAnimationEnd'
+            };
+
+            for (var t in animations) {
+                if (el.style[t] !== undefined) {
+                    return animations[t];
+                }
+            }
+        }(document.createElement('div'));
+
+        this.addClass('animated ' + animationName).one(animationEnd, function () {
+            $(this).removeClass('animated ' + animationName);
+
+            if (typeof callback === 'function') callback();
+        });
+
+        return this;
+    }
+});
+
+var app = {};
+app.document = $(document);
+app.orientation = true; //true - горизонтально, false - вертикально
+// if(app.orientation){
+//     app.scroll = $(document).scrollLeft();
+// }else{
+//     app.scroll = $(document).scrollTop();
+// }
+app.row = $('#row');
+app.blocks = $('#row >div');
+// app.blocksStartPositionRight = 0;
+// app.offsetRow = 0;
+// app.scrollMode = 0; // 0 - Мод простого скрола, 1 - мод последовательного скрола
+// app.width = 0; //При app.orientation = false; становится height
+// app.touch = {
+//     pageX: 0,
+//     pageY: 0
+// };
+app.menu = {};
+app.menu.s = $('#menu');
+app.menu.open = false;
+app.border = {};
+app.border.s = $('#border');
+app.logo = {};
+app.logo.position = { top: 0, left: 0 };
+app.logo.centerPosition = { top: 0, left: 0 };
+app.logo.width = 0;
+app.logo.height = 0;
+app.logo.s = $('#logo');
+app.logo.original = app.logo.s.html();
+app.logo.setParameters = function () {
+    app.logo.position = app.logo.s.position();
+    app.logo.width = app.logo.s.width();
+    app.logo.height = app.logo.s.height();
+    var widthWindow = $(window).width();
+    app.logo.centerPosition = { top: app.logo.position.top + app.logo.height + widthWindow / 40, left: app.logo.position.left + app.logo.width + widthWindow / 40 };
+};
+function calcHypotenuse(a, b) {
+    return Math.sqrt(a * a + b * b);
+}
+app.logo.containers = [];
+app.logo.aniItemsCount = 4;
+app.logo.aniItems = {};
+app.logo.state = {
+    current: 0, //Нумерация начинается с 0
+    final: 0, //Нумерация начинается с 0
+    headSteps: 2, //Нумерация начинается с 1
+    timeout: {
+        head: 200,
+        items: 200
+    },
+    aim: 0,
+    transition: 'top .2s ease-in, left .2s ease-in',
+    animationClassIn: 'slideInDown faster',
+    animationClassOut: 'slideOutUp faster',
+    ready: true
+};
+app.logo.initConvert = function () {
+    app.logo.state = {
+        current: 0, //Нумерация начинается с 0
+        final: 0, //Нумерация начинается с 0
+        headSteps: 2, //Нумерация начинается с 1
+        timeout: {
+            head: 200,
+            items: 200
+        },
+        aim: 0,
+        transition: 'top .2s ease-in, left .2s ease-in',
+        animationClassIn: 'slideInDown faster',
+        animationClassOut: 'slideOutUp faster',
+        ready: true
+    };
+    app.logo.containers = [];
+    app.menu.s.css('left', "-" + app.menu.s.css('width'));
+    app.border.s.css('display', 'none');
+    app.logo.s.html(app.logo.original);
+    var text = app.logo.s.text().replace(/(\n)/g, "").replace(/^\s*/, "").replace(/\s*$/, "").split(' ');
+    var gLogoString = "";
+    for (var i = 0; i < text.length; i++) {
+        var idLogo = 'logo__' + i;
+        var object = { head: "#" + idLogo, items: [], left: 0 };
+        gLogoString = gLogoString + "<span id='" + idLogo + "' class='logo' style='transition: none'>";
+        for (var j = 0; j < text[i].length; j++) {
+            var id = "logo__" + i + "__" + j;
+            if (j !== 0) {
+                object.items.push("#" + id);
+            }
+            var classItem = "logo__items";
+            if (j === 0) {
+                classItem = "logo__head";
+            }
+            gLogoString = gLogoString + "<span id='" + id + "' class='logo " + classItem + "'>" + text[i].slice(j, j + 1) + "</span>";
+        }
+        app.logo.containers.push(object);
+        gLogoString = gLogoString + "</span>";
+    }
+    app.logo.s.html(gLogoString);
+    var widthOld = null;
+    for (var _i = 0; _i < app.logo.containers.length; _i++) {
+        var item = $(app.logo.containers[_i].head);
+        if (widthOld) {
+            app.logo.containers[_i].left = widthOld + _i + "px";
+            item.css('left', widthOld + _i + "px");
+            widthOld = widthOld + $(app.logo.containers[_i].head).width();
+        } else {
+            widthOld = $(app.logo.containers[_i].head).width();
+        }
+        item.css('transition', app.logo.state.transition);
+    }
+    app.logo.setParameters();
+    var y = 0;
+    for (var _i2 = 0; _i2 < app.logo.containers.length; _i2++) {
+        app.logo.containers[_i2].items = app.logo.containers[_i2].items.sort(compareRandom);
+
+        for (var _j = 0; _j < app.logo.containers[_i2].items.length; _j++) {
+            if (y < app.logo.aniItemsCount) {
+                if (!app.logo.aniItems[y]) {
+                    app.logo.aniItems[y] = [];
+                }
+                app.logo.aniItems[y].push(app.logo.containers[_i2].items[_j]);
+
+                y++;
+            } else {
+                y = 0;
+                if (!app.logo.aniItems[y]) {
+                    app.logo.aniItems[y] = [];
+                }
+                app.logo.aniItems[y].push(app.logo.containers[_i2].items[_j]);
+                y++;
+            }
+        }
+    }
+    app.logo.state.final = app.logo.aniItemsCount + app.logo.state.headSteps;
+};
+app.logo.recursiveTransform = function () {
+    if (app.logo.state.ready && app.logo.state.current !== app.logo.state.aim && !app.menu.open) {
+        if (app.logo.state.aim > app.logo.state.current) {
+            // Разворачиание логотипа
+            switch (app.logo.state.current) {
+                case 0:
+                    for (var i = 0; i < app.logo.containers.length; i++) {
+                        var item = $(app.logo.containers[i].head);
+                        item.css('top', item.height() * i);
+                    }
+                    break;
+                case 1:
+                    for (var _i3 = 0; _i3 < app.logo.containers.length; _i3++) {
+                        var _item = $(app.logo.containers[_i3].head);
+                        _item.css('top', _item.height() * _i3);
+                        _item.css('left', 0);
+                    }
+                    break;
+                default:
+                    var index = app.logo.state.current - app.logo.state.headSteps;
+                    $('.logo__items').css('display', 'block');
+                    if (app.logo.aniItems[index]) {
+                        for (var _i4 = 0; _i4 < app.logo.aniItems[index].length; _i4++) {
+                            var _item2 = $(app.logo.aniItems[index][_i4]);
+                            _item2.animateCss(app.logo.state.animationClassIn);
+                            _item2.css('opacity', '1');
+                        }
+                    }
+                    // for(let i = 0; i<app.logo.containers.length; i++){
+                    //     let item = $(app.logo.containers[i].items[index]);
+                    //     item.animateCss(app.logo.state.animationClassIn);
+                    //     item.css('opacity', '1');
+                    // }
+                    break;
+            }
+            if (app.logo.state.current >= 3) {
+                var timeout = null;
+                clearTimeout(timeout);
+                timeout = setTimeout(function () {
+                    if (app.logo.state.current >= app.logo.state.final) {
+                        app.menu.open = true;
+                    }
+                    app.menu.s.css('left', 0);
+                    app.border.s.css('display', 'block');
+                }, 0);
+            }
+            app.logo.state.current++;
+        } else {
+            // Сворачивание логотипа
+            switch (app.logo.state.current) {
+                case 1:
+                    for (var _i5 = 0; _i5 < app.logo.containers.length; _i5++) {
+                        var _item3 = $(app.logo.containers[_i5].head);
+                        _item3.css('top', 0);
+                        _item3.css('left', app.logo.containers[_i5].left);
+                    }
+                    break;
+                case 2:
+                    $('.logo__items').css('display', 'inline');
+                    for (var _i6 = 0; _i6 < app.logo.containers.length; _i6++) {
+                        var _item4 = $(app.logo.containers[_i6].head);
+                        _item4.css('top', _item4.height() * _i6);
+                        _item4.css('left', app.logo.containers[_i6].left);
+                    }
+                    break;
+                default:
+                    var _index = app.logo.state.current - app.logo.state.headSteps - 1;
+                    if (app.logo.aniItems[_index]) {
+                        for (var _i7 = 0; _i7 < app.logo.aniItems[_index].length; _i7++) {
+                            var _item5 = $(app.logo.aniItems[_index][_i7]);
+                            _item5.animateCss(app.logo.state.animationClassOut);
+                            _item5.css('opacity', '0');
+                        }
+                    }
+                    //     for(let i = 0; i<app.logo.containers.length; i++){
+                    //         let item = $(app.logo.containers[i].items[index]);
+                    //         item.animateCss(app.logo.state.animationClassOut);
+                    //         item.css('opacity', '0');
+                    //     }
+                    break;
+            }
+            if (app.logo.state.current <= 4) {
+                var _timeout = null;
+                clearTimeout(_timeout);
+                _timeout = setTimeout(function () {
+                    app.menu.open = false;
+                    app.menu.s.css('left', "-" + app.menu.s.css('width'));
+                    app.border.s.css('display', 'none');
+                }, 0);
+            }
+            app.logo.state.current--;
+        }
+
+        if (app.logo.state.current < app.logo.state.headSteps) {
+            setTimeout(function () {
+                app.logo.state.ready = true;
+                app.logo.recursiveTransform();
+            }, app.logo.state.timeout.head);
+            app.logo.state.ready = false;
+        } else {
+            if (app.logo.state.current <= app.logo.state.final) {
+                setTimeout(function () {
+                    app.logo.state.ready = true;
+                    app.logo.recursiveTransform();
+                }, app.logo.state.timeout.items);
+                app.logo.state.ready = false;
+            } else {
+                app.logo.state.ready = true;
+            }
+        }
+    }
+};
+app.logo.transform = function (cursor) {
+    var x = app.logo.centerPosition.left - cursor.x;
+    var y = app.logo.centerPosition.top - cursor.y;
+    var hypotenuse = calcHypotenuse(x, y);
+    var widthWindow = $(window).width();
+    var hypotenuseChunk = hypotenuse / (widthWindow / 50);
+    hypotenuseChunk = hypotenuseChunk - 5;
+    if (hypotenuseChunk > app.logo.state.final + 4 && widthWindow > 500) {
+        app.menu.open = false;
+    }
+    if (hypotenuseChunk <= app.logo.state.final) {
+        app.logo.state.aim = Math.round(app.logo.state.final - hypotenuseChunk);
+        app.logo.recursiveTransform();
+    } else {
+        app.logo.state.aim = 0;
+        app.logo.recursiveTransform();
+    }
+};
+app.changeOrientation = function () {
+    if ($(app.blocks[0]).width() === app.document.width()) {
+        app.orientation = false;
+        $('html, body').css('overflow', 'auto');
+        app.row.addClass('js-column');
+    } else {
+        app.orientation = true;
+        $('html, body').css('overflow', 'hidden');
+        app.row.removeClass('js-column');
+    }
+};
+
+app.setBlurBlock = function (elements) {
+    elements.find('text').css('opacity', 1);
+    setTimeout(function () {
+        elements.addClass('active');
+    }, 300);
+    var newElements = elements.find('feGaussianBlur');
+    var deviation = 0;
+    var fun = function fun() {
+        var val = 5 * (Math.sin(deviation += 0.1) + 1);
+        newElements.attr('stdDeviation', val);
+        if (val <= 9) {
+            setTimeout(fun, 0);
+        } else {
+            newElements.attr('stdDeviation', 10);
+        }
+    };
+    setTimeout(fun, 0);
+};
+
+app.unSetBlurBlock = function (elements) {
+    elements.find('text').css('opacity', 0);
+    setTimeout(function () {
+        elements.removeClass('active');
+    }, 300);
+    var newElements = elements.find('feGaussianBlur');
+    var deviation = 10;
+    var fun = function fun() {
+        var val = 5 * (Math.sin(deviation += 0.1) + 1);
+        newElements.attr('stdDeviation', val);
+        if (val > 1) {
+            setTimeout(fun, 0);
+        } else {
+            newElements.attr('stdDeviation', 0);
+        }
+    };
+    setTimeout(fun, 0);
+};
+app.init = function () {
+    app.menu.open = false;
+    app.changeOrientation();
+    app.logo.initConvert();
+};
+app.bind = function () {
+    $(document).on('mousemove', function (e) {
+        var X = e.pageX; // положения по оси X
+        var Y = e.pageY; // положения по оси Y
+        app.logo.transform({ x: X, y: Y });
+    });
+    $('.img-blur__link').on('click', function (event) {
+        var img = $(this).find('.img-blur');
+        if (!img.hasClass('active')) {
+            event.preventDefault();
+            app.setBlurBlock(img);
+        }
+    });
+    $('#logo').on('click', function (event) {
+        if (app.logo.state.current <= app.logo.state.final) {
+            event.preventDefault();
+            app.logo.state.aim = app.logo.state.final;
+            app.logo.recursiveTransform();
+        }
+    });
+    $('.border').on('click', function (event) {
+        event.preventDefault();
+        app.menu.open = false;
+        app.logo.state.aim = 0;
+        app.logo.recursiveTransform();
+    });
+    $('.img-blur').hover(function () {
+        app.setBlurBlock($(this));
+    }, function () {
+        app.unSetBlurBlock($(this));
+    });
+    var timeout = null;
+    $(window).resize(function () {
+        clearTimeout(timeout);
+        timeout = setTimeout(function () {
+            app.init();
+        }, 500);
+    });
+};
+app.bind();
+app.init();
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -10824,7 +10862,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 (function (factory) {
     if ( true ) {
         // AMD. Register as an anonymous module.
-        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(11)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(0)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -11040,7 +11078,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 13 */
+/* 8 */
 /***/ (function(module, exports) {
 
 /**
@@ -11304,7 +11342,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 14 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -28414,10 +28452,10 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15), __webpack_require__(16)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10), __webpack_require__(11)(module)))
 
 /***/ }),
-/* 15 */
+/* 10 */
 /***/ (function(module, exports) {
 
 var g;
@@ -28444,7 +28482,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 16 */
+/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {

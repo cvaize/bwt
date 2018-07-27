@@ -56,6 +56,7 @@ app.blocks = $('#row >div');
 // };
 app.menu = {};
 app.menu.s = $('#menu');
+app.menu.open = false;
 app.border = {};
 app.border.s = $('#border');
 app.logo = {};
@@ -71,12 +72,13 @@ app.logo.setParameters = function(){
     app.logo.height = app.logo.s.height();
     let widthWindow = $(window).width();
     app.logo.centerPosition = {top:(app.logo.position.top+app.logo.height + widthWindow/40), left:(app.logo.position.left+app.logo.width + widthWindow/40)};
-    // console.log(app.logo.centerPosition);
 };
 function calcHypotenuse(a, b) {
     return(Math.sqrt((a * a) + (b * b)));
 }
 app.logo.containers = [];
+app.logo.aniItemsCount = 4;
+app.logo.aniItems = {};
 app.logo.state = {
     current: 0,//Нумерация начинается с 0
     final: 0,//Нумерация начинается с 0
@@ -113,10 +115,6 @@ app.logo.initConvert = function(){
     let text = app.logo.s.text().replace(/(\n)/g, "").replace(/^\s*/, "").replace(/\s*$/, "").split(' ');
     let gLogoString = "";
     for(let i = 0; i<text.length; i++){
-        if(app.logo.state.final < (text[i].length - 1 + app.logo.state.headSteps)){
-            app.logo.state.final = (text[i].length - 1 + app.logo.state.headSteps);
-            // console.log(app.logo.state.final);
-        }
         let idLogo = 'logo__'+i;
         let object = {head:"#"+idLogo, items:[], left:0};
         gLogoString = gLogoString + "<span id='"+idLogo+"' class='logo' style='transition: none'>";
@@ -146,16 +144,28 @@ app.logo.initConvert = function(){
         item.css('transition', app.logo.state.transition);
     }
     app.logo.setParameters();
-
+    let y = 0;
     for(let i = 0; i<app.logo.containers.length; i++){
         app.logo.containers[i].items = app.logo.containers[i].items.sort(compareRandom);
-    }
 
-    // console.log(app.logo.containers);
+        for(let j = 0; j<app.logo.containers[i].items.length; j++){
+            if(y < app.logo.aniItemsCount){
+                if(!app.logo.aniItems[y]){app.logo.aniItems[y] = [];}
+                app.logo.aniItems[y].push(app.logo.containers[i].items[j]);
+
+                y++;
+            }else{
+                y = 0;
+                if(!app.logo.aniItems[y]){app.logo.aniItems[y] = [];}
+                app.logo.aniItems[y].push(app.logo.containers[i].items[j]);
+                y++;
+            }
+        }
+    }
+    app.logo.state.final = (app.logo.aniItemsCount + app.logo.state.headSteps);
 };
 app.logo.recursiveTransform = function(){
-    if(app.logo.state.ready && app.logo.state.current !== app.logo.state.aim){
-        // console.log('app.logo.recursiveTransform', app.logo.state.current, app.logo.state.aim);
+    if(app.logo.state.ready && app.logo.state.current !== app.logo.state.aim && !app.menu.open){
         if(app.logo.state.aim > app.logo.state.current){    // Разворачиание логотипа
             switch (app.logo.state.current){
                 case 0:
@@ -174,19 +184,30 @@ app.logo.recursiveTransform = function(){
                 default:
                     let index = app.logo.state.current - app.logo.state.headSteps;
                         $('.logo__items').css('display', 'block');
-                        for(let i = 0; i<app.logo.containers.length; i++){
-                            let item = $(app.logo.containers[i].items[index]);
-                            item.animateCss(app.logo.state.animationClassIn);
-                            item.css('opacity', '1');
+                        if(app.logo.aniItems[index]){
+                            for(let i = 0; i<app.logo.aniItems[index].length; i++){
+                                let item = $(app.logo.aniItems[index][i]);
+                                item.animateCss(app.logo.state.animationClassIn);
+                                item.css('opacity', '1');
+                            }
                         }
+                        // for(let i = 0; i<app.logo.containers.length; i++){
+                        //     let item = $(app.logo.containers[i].items[index]);
+                        //     item.animateCss(app.logo.state.animationClassIn);
+                        //     item.css('opacity', '1');
+                        // }
                     break;
             }
             if(app.logo.state.current >= 3){
                 let timeout = null;
                 clearTimeout(timeout);
                 timeout = setTimeout(function () {
+                    if(app.logo.state.current >= app.logo.state.final){
+                        app.menu.open = true;
+                    }
                     app.menu.s.css('left', 0);
                     app.border.s.css('display', 'block');
+
                 }, 0);
             }
             app.logo.state.current++;
@@ -209,19 +230,29 @@ app.logo.recursiveTransform = function(){
                     break;
                 default:
                     let index = app.logo.state.current - app.logo.state.headSteps - 1;
-                        for(let i = 0; i<app.logo.containers.length; i++){
-                            let item = $(app.logo.containers[i].items[index]);
+                    if(app.logo.aniItems[index]){
+                        for(let i = 0; i<app.logo.aniItems[index].length; i++){
+                            let item = $(app.logo.aniItems[index][i]);
                             item.animateCss(app.logo.state.animationClassOut);
                             item.css('opacity', '0');
                         }
+                    }
+                    //     for(let i = 0; i<app.logo.containers.length; i++){
+                    //         let item = $(app.logo.containers[i].items[index]);
+                    //         item.animateCss(app.logo.state.animationClassOut);
+                    //         item.css('opacity', '0');
+                    //     }
                     break;
             }
-            let timeout = null;
-            clearTimeout(timeout);
-            timeout = setTimeout(function () {
-                app.menu.s.css('left', "-"+app.menu.s.css('width'));
-                app.border.s.css('display', 'none');
-            }, 0);
+            if(app.logo.state.current <= 4){
+                let timeout = null;
+                clearTimeout(timeout);
+                timeout = setTimeout(function () {
+                    app.menu.open = false;
+                    app.menu.s.css('left', "-"+app.menu.s.css('width'));
+                    app.border.s.css('display', 'none');
+                }, 0);
+            }
             app.logo.state.current--;
         }
 
@@ -230,13 +261,18 @@ app.logo.recursiveTransform = function(){
                 app.logo.state.ready = true;
                 app.logo.recursiveTransform();
             }, app.logo.state.timeout.head);
+            app.logo.state.ready = false;
         }else{
-            setTimeout(function () {
+            if(app.logo.state.current <= app.logo.state.final){
+                setTimeout(function () {
+                    app.logo.state.ready = true;
+                    app.logo.recursiveTransform();
+                }, app.logo.state.timeout.items);
+                app.logo.state.ready = false;
+            }else{
                 app.logo.state.ready = true;
-                app.logo.recursiveTransform();
-            }, app.logo.state.timeout.items);
+            }
         }
-        app.logo.state.ready = false;
     }
 };
 app.logo.transform = function(cursor){
@@ -246,9 +282,11 @@ app.logo.transform = function(cursor){
     let widthWindow = $(window).width();
     let hypotenuseChunk = hypotenuse/(widthWindow/50);
     hypotenuseChunk = hypotenuseChunk - 5;
+    if(hypotenuseChunk > app.logo.state.final + 4 && widthWindow > 500){
+        app.menu.open = false;
+    }
     if(hypotenuseChunk <= app.logo.state.final){
         app.logo.state.aim = Math.round(app.logo.state.final-hypotenuseChunk);
-        // console.log(Math.round(app.logo.state.final-hypotenuseChunk));
         app.logo.recursiveTransform();
     }else{
         app.logo.state.aim = 0;
@@ -305,6 +343,7 @@ app.unSetBlurBlock = function (elements) {
     setTimeout(fun, 0);
 };
 app.init = function(){
+    app.menu.open = false;
     app.changeOrientation();
     app.logo.initConvert();
 };
@@ -321,15 +360,16 @@ app.bind = function () {
             app.setBlurBlock(img);
         }
     });
-    $('.logo').on('click', function(event) {
-        if(app.logo.state.current !== app.logo.state.final + 4){
+    $('#logo').on('click', function(event) {
+        if(app.logo.state.current <= app.logo.state.final){
             event.preventDefault();
-            app.logo.state.aim = app.logo.state.final + 4;
+            app.logo.state.aim = app.logo.state.final;
             app.logo.recursiveTransform();
         }
     });
     $('.border').on('click', function(event) {
         event.preventDefault();
+        app.menu.open = false;
         app.logo.state.aim = 0;
         app.logo.recursiveTransform();
     });

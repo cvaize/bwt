@@ -1,8 +1,8 @@
 {
+    "/js/welcome.js": "/js/welcome.js",
     "/js/app.js": "/js/app.js",
     "/css/app.css": "/css/app.css",
     "/css/welcome.css": "/css/welcome.css",
-    "/js/welcome.js": "/js/welcome.js",
     "/css/all.css": "/css/all.css",
     "/js/all.js": "/js/all.js"
 }
