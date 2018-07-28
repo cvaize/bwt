@@ -2,8 +2,8 @@ window.$ = require('jquery');
 window.jQuery = window.$;
 window.jquery = window.$;
 require('jquery-mousewheel');
-require('tocca');
-window._ = require('lodash');
+// require('tocca');
+// window._ = require('lodash');
 
 //html2canvas -> Делать снимок и узнавать цвет пикселей для рекурсивной корректировки цвета
 function compareRandom(a, b) {
@@ -39,21 +39,12 @@ $.fn.extend({
 const app = {};
 app.document = $(document);
 app.orientation = true; //true - горизонтально, false - вертикально
-// if(app.orientation){
-//     app.scroll = $(document).scrollLeft();
-// }else{
-//     app.scroll = $(document).scrollTop();
-// }
 app.row = $('#row');
 app.blocks = $('#row >div');
-// app.blocksStartPositionRight = 0;
-// app.offsetRow = 0;
-// app.scrollMode = 0; // 0 - Мод простого скрола, 1 - мод последовательного скрола
-// app.width = 0; //При app.orientation = false; становится height
-// app.touch = {
-//     pageX: 0,
-//     pageY: 0
-// };
+app.touch = {
+    pageX: 0,
+    pageY: 0
+};
 app.menu = {};
 app.menu.s = $('#menu');
 app.menu.open = false;
@@ -345,37 +336,39 @@ app.init = function(){
     app.logo.initConvert();
 };
 app.bind = function () {
-    // $(document).on('touchend', function(e) {
-    //     console.log('touchend');
-    //     app.touch.pageX = 0;
-    //     app.touch.pageY = 0;
-    // });
-    // $(document).on('touchstart', function(e) {
-    //     console.log('touchstart');
-    //     app.touch.pageX = 0;
-    //     app.touch.pageY = 0;
-    // });
-    // $(document).on('touchmove', function(e) {
-    //     let touch = e.touches[0];
-    //     console.log('touchmove',touch.pageX + " - " + touch.pageY);
-    //     if(app.touch.pageX === 0){
-    //         app.touch.pageX = touch.pageX;
-    //     }
-    //     if(app.touch.pageY === 0){
-    //         app.touch.pageY = touch.pageY;
-    //     }
-    //     if(app.orientation){
-    //         app.setScroll(app.scroll + -1*(touch.pageX - app.touch.pageX));
-    //     }else{
-    //         app.setScroll(app.scroll + -1*(touch.pageY - app.touch.pageY));
-    //     }
-    //     app.touch.pageX = touch.pageX;
-    //     app.touch.pageY = touch.pageY;
-    // });
+    window.addEventListener("touchstart", function(e) {
+        app.touch.pageX = 0;
+        app.touch.pageY = 0;
+    });
+    window.addEventListener("touchend", function(e) {
+        app.touch.pageX = 0;
+        app.touch.pageY = 0;
+    });
+    window.addEventListener("touchmove", function(e) {
+        if(app.orientation){
+            event.preventDefault();
+            let touch = e.touches[0];
+            if(app.touch.pageX === 0){
+                app.touch.pageX = touch.pageX;
+            }
+            if(app.touch.pageY === 0){
+                app.touch.pageY = touch.pageY;
+            }
+            console.log(-1*(touch.pageX - app.touch.pageX));
+            let set = app.row.scrollTop() + -1*(touch.pageX - app.touch.pageX)*1.5;
+            app.row.scrollTop(set);
+
+            app.touch.pageX = touch.pageX;
+            app.touch.pageY = touch.pageY;
+
+        }
+
+    }, {passive: false} );
     $(document).on('mousemove', function(e){
         let X = e.pageX; // положения по оси X
         let Y = e.pageY; // положения по оси Y
         app.logo.transform({x:X, y:Y});
+        console.log(app.row.scrollLeft());
     });
     $('.img-blur__link').on('click', function(event) {
         let img = $(this).find('.img-blur');
