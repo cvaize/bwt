@@ -10531,8 +10531,8 @@ app.logo.state = {
     },
     aim: 0,
     transition: 'top .2s ease-in, left .2s ease-in',
-    animationClassIn: 'slideInDown faster',
-    animationClassOut: 'slideOutUp faster',
+    animationClassIn: 'slideInDownC faster',
+    animationClassOut: 'slideOutUpC faster',
     ready: true
 };
 app.logo.initConvert = function () {
@@ -10579,8 +10579,8 @@ app.logo.initConvert = function () {
     for (var _i = 0; _i < app.logo.containers.length; _i++) {
         var item = $(app.logo.containers[_i].head);
         if (widthOld) {
-            app.logo.containers[_i].left = widthOld + _i + "px";
-            item.css('left', widthOld + _i + "px");
+            app.logo.containers[_i].left = widthOld + "px";
+            item.css('left', widthOld + "px");
             widthOld = widthOld + $(app.logo.containers[_i].head).width();
         } else {
             widthOld = $(app.logo.containers[_i].head).width();

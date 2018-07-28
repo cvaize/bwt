@@ -1,46 +1,63 @@
-/* Отличный вариант на чистом css, но нам не подходит
-::-webkit-scrollbar{width:0;height:0;}
-::-webkit-scrollbar-button{width:0;height:0;}
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&subset=cyrillic');
+@import url('https://fonts.googleapis.com/css?family=Asap');
 
-div{
-  box-sizing:border-box;
-}
+@-webkit-keyframes slideInDownC {
+  from {
+    top: -100%;
+    visibility: visible;
+  }
 
-body {
-  background: #111;
-}
-
-.horizontal-scroll-wrapper{
-  position:absolute;
-  display:block;
-  top:0;
-  left:0;
-  width:100vh;
-  max-height: 100vw;
-  margin:0;
-  background:#abc;
-  overflow-y:auto;
-  overflow-x:hidden;
-  transform:rotate(-90deg) translateY(-100vh);
-  transform-origin:right top;
-}
-.horizontal-scroll-wrapper > div{
-  display:block;
-  background:#cab;
-  transform:rotate(90deg);
-  transform-origin: right top;
+  to {
+    top: 0;
+  }
 }
 
-.rectangles{
-  top: 0;
-  padding:100vh 0 0 0;
+@keyframes slideInDownC {
+  from {
+    top: -100%;
+    visibility: visible;
+  }
+
+  to {
+    top: 0;
+  }
 }
-.rectangles > div{
-  background:#cab;
-  transform:rotate(90deg) translateY(0);
-  transform-origin: right top;
+
+.slideInDownC {
+  -webkit-animation-name: slideInDownC;
+  animation-name: slideInDownC;
+  //position: relative;
 }
-*/
+
+@-webkit-keyframes slideOutUpC {
+  from {
+    top: 0;
+  }
+
+  to {
+    visibility: hidden;
+    top: -100%;
+  }
+}
+
+@keyframes slideOutUpC {
+  from {
+    top: 0;
+  }
+
+  to {
+    visibility: hidden;
+    top: -100%;
+  }
+}
+
+.slideOutUpC {
+  -webkit-animation-name: slideOutUpC;
+  animation-name: slideOutUpC;
+  //position: relative;
+}
+
+
 ::-webkit-scrollbar{width:0;height:0;}
 ::-webkit-scrollbar-button{width:0;height:0;}
 html{
@@ -54,6 +71,7 @@ body{
   margin: 0;
   position: relative;
   background: #000000;
+  font-family: 'Source Sans Pro', sans-serif;
 }
 //#welcome{
 //  position: relative;
@@ -136,6 +154,7 @@ body{
   margin: 0;
   padding: 0;
   z-index: 10;
+  font-family: 'Asap', sans-serif;
   *{
     position: relative;
     line-height: 1.2;
@@ -195,3 +214,5 @@ a{
   z-index: 5;
   display: none;
 }
+
+
