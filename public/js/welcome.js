@@ -10740,9 +10740,6 @@ app.logo.transform = function (cursor) {
     var widthWindow = $(window).width();
     var hypotenuseChunk = hypotenuse / (widthWindow / 50);
     hypotenuseChunk = hypotenuseChunk - 5;
-    if (hypotenuseChunk > app.logo.state.final + 4 && widthWindow > 500) {
-        app.menu.open = false;
-    }
     if (hypotenuseChunk <= app.logo.state.final) {
         app.logo.state.aim = Math.round(app.logo.state.final - hypotenuseChunk);
         app.logo.recursiveTransform();
@@ -10806,6 +10803,33 @@ app.init = function () {
     app.logo.initConvert();
 };
 app.bind = function () {
+    // $(document).on('touchend', function(e) {
+    //     console.log('touchend');
+    //     app.touch.pageX = 0;
+    //     app.touch.pageY = 0;
+    // });
+    // $(document).on('touchstart', function(e) {
+    //     console.log('touchstart');
+    //     app.touch.pageX = 0;
+    //     app.touch.pageY = 0;
+    // });
+    // $(document).on('touchmove', function(e) {
+    //     let touch = e.touches[0];
+    //     console.log('touchmove',touch.pageX + " - " + touch.pageY);
+    //     if(app.touch.pageX === 0){
+    //         app.touch.pageX = touch.pageX;
+    //     }
+    //     if(app.touch.pageY === 0){
+    //         app.touch.pageY = touch.pageY;
+    //     }
+    //     if(app.orientation){
+    //         app.setScroll(app.scroll + -1*(touch.pageX - app.touch.pageX));
+    //     }else{
+    //         app.setScroll(app.scroll + -1*(touch.pageY - app.touch.pageY));
+    //     }
+    //     app.touch.pageX = touch.pageX;
+    //     app.touch.pageY = touch.pageY;
+    // });
     $(document).on('mousemove', function (e) {
         var X = e.pageX; // положения по оси X
         var Y = e.pageY; // положения по оси Y
