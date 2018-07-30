@@ -20,5 +20,7 @@ mix.styles([
     ], 'public/js/all.js')
     .js('resources/assets/js/app.js', 'public/js')
     .js('resources/assets/js/welcome.js', 'public/js')
+    .js('resources/assets/js/demo1.js', 'public/js')
+    .js('resources/assets/js/demo2.js', 'public/js')
     .sass('resources/assets/sass/app.scss', 'public/css')
     .sass('resources/assets/sass/welcome.scss', 'public/css');

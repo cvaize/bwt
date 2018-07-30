@@ -21,6 +21,12 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
     Route::get('/', function () {
         return view('welcome');
     });
+    Route::get('/demo1', function () {
+        return view('demo.1');
+    });
+    Route::get('/demo2', function () {
+        return view('demo.2');
+    });
     Route::group(['middleware' => ['auth']], function () {
         Route::resource('users', 'Users\UserController');
         Route::resource('posts', 'PostController');
