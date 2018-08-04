@@ -16,6 +16,7 @@
             width: 1160px;
             height: 630px;
             /*background-image: url(/img/training/setka.png);*/
+            background: green;
             border: 1px solid;
         }
     </style>

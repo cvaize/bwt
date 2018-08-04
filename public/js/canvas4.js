@@ -10527,22 +10527,28 @@ window.jquery = window.$;
     img.src = "/img/training/looi_work_plate_01_job-today.jpg";
     img.onload = function () {
         var pattern = ctx.createPattern(img, "repeat");
+        ctx.fillStyle = pattern;
 
         function write() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.beginPath();
-            ctx.lineWidth = 0;
+            // ctx.fillStyle = pattern;
+            // ctx.fillRect(0,0,canvas.width, canvas.height);
+            // ctx.globalCompositeOperation = 'source-in';
+            // ctx.fill();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // ctx.save();
+            ctx.beginPath();
+            ctx.lineWidth = 1;
             ctx.moveTo(offset, offset);
             for (var i = 0; i < arrData.length; i++) {
                 ctx.quadraticCurveTo(data[arrData[i]].coordinatesCurrent.controlX, data[arrData[i]].coordinatesCurrent.controlY, data[arrData[i]].endX, data[arrData[i]].endY);
+                // ctx.quadraticCurveTo(data[arrData[i]].coordinatesAmbition.controlX, data[arrData[i]].coordinatesAmbition.controlY, data[arrData[i]].endX, data[arrData[i]].endY);
             }
             ctx.strokeStyle = "black";
             ctx.stroke();
-            // ctx.clip();
-            // ctx.fillStyle = pattern;
-            // ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = pattern;
+            ctx.fill();
             timeoutWrite = setTimeout(write, 0);
-            // write();
             fit();
         }
         function fit() {
@@ -10619,7 +10625,9 @@ window.jquery = window.$;
             }
         }
         write();
-        $(canvas).on('mousemove', withard);
+        $(canvas).on('mousemove', function (event) {
+            setTimeout(withard(event), 0);
+        });
         $(canvas).hover(function () {
             console.log('hover');
             // write();
@@ -10627,6 +10635,7 @@ window.jquery = window.$;
             // activeMain = true;
         }, function () {
             console.log('unhover');
+            clearTimeout(timeoutWrite);
             // activeMain = false;
         });
     };
