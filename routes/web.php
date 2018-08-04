@@ -27,6 +27,24 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
     Route::get('/demo2', function () {
         return view('demo.2');
     });
+    Route::get('/demo3', function () {
+        return view('demo.3');
+    });
+    Route::get('/demo4', function () {
+        return view('demo.4');
+    });
+    Route::get('/training/1', function () {
+        return view('training.1');
+    });
+    Route::get('/training/2', function () {
+        return view('training.2');
+    });
+    Route::get('/training/3', function () {
+        return view('training.3');
+    });
+    Route::get('/training/4', function () {
+        return view('training.4');
+    });
     Route::group(['middleware' => ['auth']], function () {
         Route::resource('users', 'Users\UserController');
         Route::resource('posts', 'PostController');

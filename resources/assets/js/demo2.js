@@ -10,7 +10,6 @@ let cursore = {
 function calcHypotenuse(a, b) {
     return(Math.sqrt((a * a) + (b * b)));
 }
-console.log(Math.sin(10));
 let colors = ["rgb(0, 30, 255)", "rgb(255, 0, 0)", "rgb(13, 208, 27)", "rgb(255, 0, 252)"];
 let blob = ()=>{
     $('.blob').each(function (index) {

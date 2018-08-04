@@ -22,5 +22,13 @@ mix.styles([
     .js('resources/assets/js/welcome.js', 'public/js')
     .js('resources/assets/js/demo1.js', 'public/js')
     .js('resources/assets/js/demo2.js', 'public/js')
+    .js('resources/assets/js/demo3.js', 'public/js')
+    .js('resources/assets/js/demo4.js', 'public/js')
+    .js('resources/assets/js/training/canvas1.js', 'public/js')
+    .js('resources/assets/js/training/canvas2.js', 'public/js')
+    .js('resources/assets/js/training/canvas3.js', 'public/js')
+    .js('resources/assets/js/training/canvas4.js', 'public/js')
     .sass('resources/assets/sass/app.scss', 'public/css')
+    .sass('resources/assets/sass/demo3.scss', 'public/css')
+    .sass('resources/assets/sass/demo4.scss', 'public/css')
     .sass('resources/assets/sass/welcome.scss', 'public/css');

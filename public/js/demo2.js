@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 12);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -10437,15 +10437,15 @@ return jQuery;
 
 /***/ }),
 
-/***/ 10:
+/***/ 12:
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(11);
+module.exports = __webpack_require__(13);
 
 
 /***/ }),
 
-/***/ 11:
+/***/ 13:
 /***/ (function(module, exports, __webpack_require__) {
 
 window.$ = __webpack_require__(0);
@@ -10460,7 +10460,6 @@ var cursore = {
 function calcHypotenuse(a, b) {
     return Math.sqrt(a * a + b * b);
 }
-console.log(Math.sin(10));
 var colors = ["rgb(0, 30, 255)", "rgb(255, 0, 0)", "rgb(13, 208, 27)", "rgb(255, 0, 252)"];
 var blob = function blob() {
     $('.blob').each(function (index) {
