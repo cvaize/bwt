@@ -29,6 +29,7 @@
         "jquery-mask-plugin": "^1.14.15",
         "jquery-mousewheel": "^3.1.13",
         "popper.js": "^1.14.3",
+        "setimmediate": "^1.0.5",
         "tocca": "^2.0.3"
     }
 }

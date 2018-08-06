@@ -28,6 +28,7 @@ mix.styles([
     .js('resources/assets/js/training/canvas2.js', 'public/js')
     .js('resources/assets/js/training/canvas3.js', 'public/js')
     .js('resources/assets/js/training/canvas4.js', 'public/js')
+    .js('resources/assets/js/training/curvedImage/curvedImage.js', 'public/js')
     .sass('resources/assets/sass/app.scss', 'public/css')
     .sass('resources/assets/sass/demo3.scss', 'public/css')
     .sass('resources/assets/sass/demo4.scss', 'public/css')

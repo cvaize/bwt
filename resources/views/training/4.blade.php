@@ -24,9 +24,7 @@
 <body>
 <div style="padding: 200px;">
     <div class="position-relative">
-        <canvas id="canvas" width="1160" height="630">
-
-        </canvas>
+        <canvas id="canvas" width="1160" height="630"></canvas>
     </div>
 </div>
 <script src="/js/canvas4.js"></script>

@@ -81,18 +81,12 @@ window.jquery = window.$;
 
         function write() {
             ctx.beginPath();
-            // ctx.fillStyle = pattern;
-            // ctx.fillRect(0,0,canvas.width, canvas.height);
-            // ctx.globalCompositeOperation = 'source-in';
-            // ctx.fill();
             ctx.clearRect(0,0,canvas.width, canvas.height);
-            // ctx.save();
             ctx.beginPath();
             ctx.lineWidth = 1;
             ctx.moveTo(offset, offset);
             for(let i = 0; i < arrData.length; i++){
                 ctx.quadraticCurveTo(data[arrData[i]].coordinatesCurrent.controlX, data[arrData[i]].coordinatesCurrent.controlY, data[arrData[i]].endX, data[arrData[i]].endY);
-                // ctx.quadraticCurveTo(data[arrData[i]].coordinatesAmbition.controlX, data[arrData[i]].coordinatesAmbition.controlY, data[arrData[i]].endX, data[arrData[i]].endY);
             }
             ctx.strokeStyle = "black";
             ctx.stroke();
@@ -139,11 +133,6 @@ window.jquery = window.$;
                     active = true;
                 }
             }
-            // write();
-            // if(active){
-            //
-            // }
-            // fit();
         }
         function withard(event){
             let x = event.offsetX;
@@ -176,9 +165,7 @@ window.jquery = window.$;
         });
         $(canvas).hover(function () {
             console.log('hover');
-            // write();
             timeoutWrite = setTimeout(write, 0);
-            // activeMain = true;
         }, function () {
             console.log('unhover');
             clearTimeout(timeoutWrite);

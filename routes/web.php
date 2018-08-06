@@ -45,6 +45,9 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
     Route::get('/training/4', function () {
         return view('training.4');
     });
+    Route::get('/training/5', function () {
+        return view('training.5');
+    });
     Route::group(['middleware' => ['auth']], function () {
         Route::resource('users', 'Users\UserController');
         Route::resource('posts', 'PostController');
