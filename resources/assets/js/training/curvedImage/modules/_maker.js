@@ -12,15 +12,28 @@ module.exports = function maker(t) {
             height: data.height
         });
         let canvas = $(t).find("canvas");
-        canvas.attr("width", data.width+2*data.offset);
-        canvas.attr("height", data.height+2*data.offset);
-        canvas.css({
-            width: data.width+2*data.offset,
-            height: data.height+2*data.offset,
-            position: "absolute",
-            left: -1*data.offset,
-            top: -1*data.offset
-        });
+        switch (data.offsetMode){
+            case 2:
+                canvas.attr("width", data.width+2*data.offset);
+                canvas.attr("height", data.height+2*data.offset);
+                canvas.css({
+                    width: data.width+2*data.offset,
+                    height: data.height+2*data.offset,
+                    position: "absolute",
+                    left: -1*data.offset,
+                    top: -1*data.offset
+                });
+                break;
+            default:
+                canvas.attr("width", data.width);
+                canvas.attr("height", data.height);
+                canvas.css({
+                    width: data.width,
+                    height: data.height,
+                    position: "relative"
+                });
+                break;
+        }
         canvas = canvas.get(0);
 
         let width = canvas.width;
@@ -43,7 +56,8 @@ module.exports = function maker(t) {
             coordinatesCurrent: {
                 controlX:width/2,
                 controlY:offset,
-            }
+            },
+            dovodchick: true
         };
         data.right = {
             controlX:width - offset,
@@ -57,7 +71,8 @@ module.exports = function maker(t) {
             coordinatesCurrent: {
                 controlX:width - offset,
                 controlY:height/2,
-            }
+            },
+            dovodchick: true
         };
         data.bottom = {
             controlX:width/2,
@@ -71,7 +86,8 @@ module.exports = function maker(t) {
             coordinatesCurrent: {
                 controlX:width/2,
                 controlY:height - offset,
-            }
+            },
+            dovodchick: true
         };
         data.left = {
             controlX:offset,
@@ -85,11 +101,13 @@ module.exports = function maker(t) {
             coordinatesCurrent: {
                 controlX:offset,
                 controlY:height/2,
-            }
+            },
+            dovodchick: true
         };
         data.timeoutWrite = null;
         data.timeoutFit = null;
-        data.active = false;
+        // data.active = false;
+        data.activeTimeoutWrite = false;
         // console.log("curvedImage.readyOptions", options);
         if(!canvas){
             console.log("Ошибка: холст не найден в",t);
@@ -101,34 +119,59 @@ module.exports = function maker(t) {
         ctx.fillStyle = pattern;
         data.canvas = canvas;
         data.ctx = ctx;
-
+        function checkDovodchik() {
+            let arrData = data.arrData;
+            let active = false;
+            for(let i = 0; i < arrData.length; i++){
+                let currentX = data[arrData[i]].coordinatesCurrent.controlX;
+                let currentY = data[arrData[i]].coordinatesCurrent.controlY;
+                let ambitionX = data[arrData[i]].controlX;
+                let ambitionY = data[arrData[i]].controlY;
+                if(currentX !== ambitionX || currentY !== ambitionY){
+                    active = true;
+                }
+            }
+            return active;
+        }
         function write() {
             let arrData = data.arrData;
             data.ctx.beginPath();
             data.ctx.clearRect(0,0,canvas.width, canvas.height);
             data.ctx.beginPath();
-            data.ctx.lineWidth = 1;
-            data.ctx.moveTo(data.start, data.start);
+            data.ctx.lineWidth = data.lineWidth;
+            data.ctx.moveTo(data.start.x, data.start.y);
             for(let i = 0; i < arrData.length; i++){
                 data.ctx.quadraticCurveTo(data[arrData[i]].coordinatesCurrent.controlX, data[arrData[i]].coordinatesCurrent.controlY, data[arrData[i]].endX, data[arrData[i]].endY);
             }
-            data.ctx.strokeStyle = "black";
+            data.ctx.strokeStyle = data.strokeStyle;
             data.ctx.stroke();
             data.ctx.fillStyle = pattern;
             data.ctx.fill();
-            data.timeoutWrite = setImmediate(data.write);
-            data.fit();
+            setImmediate(data.fit);
+            if(data.activeTimeoutWrite){
+                data.timeoutWrite = setImmediate(data.write);
+            }else{
+                if(checkDovodchik()){
+                    data.timeoutWrite = setImmediate(data.write);
+                }
+            }
         }
 
         function fit() {
             let arrData = data.arrData;
             let fitChunk = data.fitChunk;
-            data.active = false;
             for(let i = 0; i < arrData.length; i++){
                 let currentX = data[arrData[i]].coordinatesCurrent.controlX;
                 let currentY = data[arrData[i]].coordinatesCurrent.controlY;
-                let ambitionX = data[arrData[i]].coordinatesAmbition.controlX;
-                let ambitionY = data[arrData[i]].coordinatesAmbition.controlY;
+                let ambitionX;
+                let ambitionY;
+                if(data[arrData[i]].dovodchick || !data.activeTimeoutWrite){
+                    ambitionX = data[arrData[i]].controlX;
+                    ambitionY = data[arrData[i]].controlY;
+                }else{
+                    ambitionX = data[arrData[i]].coordinatesAmbition.controlX;
+                    ambitionY = data[arrData[i]].coordinatesAmbition.controlY;
+                }
                 if(currentX > ambitionX){
                     currentX -= fitChunk;
                     if(currentX < ambitionX){
@@ -155,9 +198,6 @@ module.exports = function maker(t) {
                 }
                 data[arrData[i]].coordinatesCurrent.controlX = currentX;
                 data[arrData[i]].coordinatesCurrent.controlY = currentY;
-                if(currentX !== ambitionX || currentY !== ambitionY){
-                    data.active = true;
-                }
             }
         }
 
@@ -170,21 +210,33 @@ module.exports = function maker(t) {
                 console.log("Верх");
                 data.top.coordinatesAmbition.controlX = x;
                 data.top.coordinatesAmbition.controlY = y;
+                data.top.dovodchick = false;
+            }else{
+                data.top.dovodchick = true;
             }
             if(x >= canvas.width-2*offset && y >= offset && y <= canvas.height - offset){
                 console.log("Право");
                 data.right.coordinatesAmbition.controlX = x;
                 data.right.coordinatesAmbition.controlY = y;
+                data.right.dovodchick = false;
+            }else{
+                data.right.dovodchick = true;
             }
             if(x >= offset && x<= canvas.width - offset && y >= canvas.height - 2*offset){
                 console.log("Низ");
                 data.bottom.coordinatesAmbition.controlX = x;
                 data.bottom.coordinatesAmbition.controlY = y;
+                data.bottom.dovodchick = false;
+            }else{
+                data.bottom.dovodchick = true;
             }
-            if(x <= 2*offset && y >= 100 && y <= canvas.height - offset){
+            if(x <= 2*offset && y >= offset && y <= canvas.height - offset){
                 console.log("Лево");
                 data.left.coordinatesAmbition.controlX = x;
                 data.left.coordinatesAmbition.controlY = y;
+                data.left.dovodchick = false;
+            }else{
+                data.left.dovodchick = true;
             }
         }
         data.write = write;

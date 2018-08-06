@@ -26,8 +26,6 @@ require("setimmediate");
             if(typeof data === "boolean" && !data){
                 return;
             }
-            // let copyOptions = Object.assign({}, options);
-            // let thisOptions = $.extend(copyOptions, data);
             let img = new Image();
             img.src = data.img;
             img.onload = function () {

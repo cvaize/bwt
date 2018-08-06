@@ -22,15 +22,15 @@
         .js-curved-image{
             width: 700px;
             height: 400px;
-            background: green;
+            /*background: green;*/
         }
     </style>
 </head>
 <body>
 <div class="p-5">
-    <div class="js-curved-image mx-auto" data-img="/img/training/looi_work_plate_01_job-today.jpg" data-options='{"offset":50,"width":960,"height":430,"fitChunk":10}'></div>
-    <div class="js-curved-image mx-auto" data-img="/img/training/looi_work_plate_01_job-today.jpg" data-options='{"offset":50,"width":700,"height":500,"fitChunk":10}'></div>
-    <div class="js-curved-image mx-auto" data-img="/img/training/looi_work_plate_01_job-today.jpg" data-options='{"offset":50,"width":700,"height":500,"fitChunk":10}'></div>
+    <div class="js-curved-image mx-auto" data-img="/img/training/looi_work_plate_01_job-today.jpg"></div>
+    <div class="js-curved-image mx-auto" data-img="/img/training/looi_work_plate_01_job-today.jpg"></div>
+    <div class="js-curved-image mx-auto" data-img="/img/training/looi_work_plate_01_job-today.jpg"></div>
 </div>
 <script src="/js/curvedImage.js"></script>
 </body>

@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 28);
+/******/ 	return __webpack_require__(__webpack_require__.s = 29);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -10625,7 +10625,7 @@ return jQuery;
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(30)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(31)))
 
 /***/ }),
 /* 2 */
@@ -10655,7 +10655,76 @@ module.exports = g;
 
 
 /***/ }),
-/* 3 */,
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
+            (typeof self !== "undefined" && self) ||
+            window;
+var apply = Function.prototype.apply;
+
+// DOM APIs, for completeness
+
+exports.setTimeout = function() {
+  return new Timeout(apply.call(setTimeout, scope, arguments), clearTimeout);
+};
+exports.setInterval = function() {
+  return new Timeout(apply.call(setInterval, scope, arguments), clearInterval);
+};
+exports.clearTimeout =
+exports.clearInterval = function(timeout) {
+  if (timeout) {
+    timeout.close();
+  }
+};
+
+function Timeout(id, clearFn) {
+  this._id = id;
+  this._clearFn = clearFn;
+}
+Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+Timeout.prototype.close = function() {
+  this._clearFn.call(scope, this._id);
+};
+
+// Does not start the time, just sets up the members needed.
+exports.enroll = function(item, msecs) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = msecs;
+};
+
+exports.unenroll = function(item) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = -1;
+};
+
+exports._unrefActive = exports.active = function(item) {
+  clearTimeout(item._idleTimeoutId);
+
+  var msecs = item._idleTimeout;
+  if (msecs >= 0) {
+    item._idleTimeoutId = setTimeout(function onTimeout() {
+      if (item._onTimeout)
+        item._onTimeout();
+    }, msecs);
+  }
+};
+
+// setimmediate attaches itself to the global object
+__webpack_require__(1);
+// On some exotic environments, it's not clear which object `setimmediate` was
+// able to install onto.  Search each possibility in the same order as the
+// `setimmediate` library.
+exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
+                       (typeof global !== "undefined" && global.setImmediate) ||
+                       (this && this.setImmediate);
+exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
+                         (typeof global !== "undefined" && global.clearImmediate) ||
+                         (this && this.clearImmediate);
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+
+/***/ }),
 /* 4 */,
 /* 5 */,
 /* 6 */,
@@ -10680,14 +10749,15 @@ module.exports = g;
 /* 25 */,
 /* 26 */,
 /* 27 */,
-/* 28 */
+/* 28 */,
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(29);
+module.exports = __webpack_require__(30);
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 window.$ = __webpack_require__(0);
@@ -10711,15 +10781,13 @@ __webpack_require__(1);
                     return this;
             }
         }
-        options = __webpack_require__(31)(options);
+        options = __webpack_require__(32)(options);
 
         var make = function make(t) {
-            var data = __webpack_require__(32)(t, options);
+            var data = __webpack_require__(33)(t, options);
             if (typeof data === "boolean" && !data) {
                 return;
             }
-            // let copyOptions = Object.assign({}, options);
-            // let thisOptions = $.extend(copyOptions, data);
             var img = new Image();
             img.src = data.img;
             img.onload = function () {
@@ -10733,7 +10801,7 @@ __webpack_require__(1);
                 t.curvedImage.data.imgObject = img;
                 $(t).trigger('curvedImage.readyOptions');
             });
-            __webpack_require__(33)(t);
+            __webpack_require__(34)(t);
             __webpack_require__(35)(t);
         };
 
@@ -10754,7 +10822,7 @@ __webpack_require__(1);
 console.log($('.js-curved-image').curvedImage());
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -10944,20 +11012,23 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports) {
 
 module.exports = function optionsModule(options) {
     return $.extend({
         offset: 100,
-        width: 700,
+        width: 900,
         height: 500,
-        fitChunk: 10
+        lineWidth: 1,
+        strokeStyle: "white",
+        fitChunk: 1,
+        offsetMode: 1 //1, 2
     }, options);
 };
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports) {
 
 module.exports = function getDataParam(t, optionsMain) {
@@ -10981,7 +11052,7 @@ module.exports = function getDataParam(t, optionsMain) {
 };
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(setImmediate) {module.exports = function maker(t) {
@@ -10998,15 +11069,28 @@ module.exports = function getDataParam(t, optionsMain) {
             height: data.height
         });
         var canvas = $(t).find("canvas");
-        canvas.attr("width", data.width + 2 * data.offset);
-        canvas.attr("height", data.height + 2 * data.offset);
-        canvas.css({
-            width: data.width + 2 * data.offset,
-            height: data.height + 2 * data.offset,
-            position: "absolute",
-            left: -1 * data.offset,
-            top: -1 * data.offset
-        });
+        switch (data.offsetMode) {
+            case 2:
+                canvas.attr("width", data.width + 2 * data.offset);
+                canvas.attr("height", data.height + 2 * data.offset);
+                canvas.css({
+                    width: data.width + 2 * data.offset,
+                    height: data.height + 2 * data.offset,
+                    position: "absolute",
+                    left: -1 * data.offset,
+                    top: -1 * data.offset
+                });
+                break;
+            default:
+                canvas.attr("width", data.width);
+                canvas.attr("height", data.height);
+                canvas.css({
+                    width: data.width,
+                    height: data.height,
+                    position: "relative"
+                });
+                break;
+        }
         canvas = canvas.get(0);
 
         var width = canvas.width;
@@ -11029,7 +11113,8 @@ module.exports = function getDataParam(t, optionsMain) {
             coordinatesCurrent: {
                 controlX: width / 2,
                 controlY: offset
-            }
+            },
+            dovodchick: true
         };
         data.right = {
             controlX: width - offset,
@@ -11043,7 +11128,8 @@ module.exports = function getDataParam(t, optionsMain) {
             coordinatesCurrent: {
                 controlX: width - offset,
                 controlY: height / 2
-            }
+            },
+            dovodchick: true
         };
         data.bottom = {
             controlX: width / 2,
@@ -11057,7 +11143,8 @@ module.exports = function getDataParam(t, optionsMain) {
             coordinatesCurrent: {
                 controlX: width / 2,
                 controlY: height - offset
-            }
+            },
+            dovodchick: true
         };
         data.left = {
             controlX: offset,
@@ -11071,11 +11158,13 @@ module.exports = function getDataParam(t, optionsMain) {
             coordinatesCurrent: {
                 controlX: offset,
                 controlY: height / 2
-            }
+            },
+            dovodchick: true
         };
         data.timeoutWrite = null;
         data.timeoutFit = null;
-        data.active = false;
+        // data.active = false;
+        data.activeTimeoutWrite = false;
         // console.log("curvedImage.readyOptions", options);
         if (!canvas) {
             console.log("Ошибка: холст не найден в", t);
@@ -11087,34 +11176,59 @@ module.exports = function getDataParam(t, optionsMain) {
         ctx.fillStyle = pattern;
         data.canvas = canvas;
         data.ctx = ctx;
-
+        function checkDovodchik() {
+            var arrData = data.arrData;
+            var active = false;
+            for (var i = 0; i < arrData.length; i++) {
+                var currentX = data[arrData[i]].coordinatesCurrent.controlX;
+                var currentY = data[arrData[i]].coordinatesCurrent.controlY;
+                var ambitionX = data[arrData[i]].controlX;
+                var ambitionY = data[arrData[i]].controlY;
+                if (currentX !== ambitionX || currentY !== ambitionY) {
+                    active = true;
+                }
+            }
+            return active;
+        }
         function write() {
             var arrData = data.arrData;
             data.ctx.beginPath();
             data.ctx.clearRect(0, 0, canvas.width, canvas.height);
             data.ctx.beginPath();
-            data.ctx.lineWidth = 1;
-            data.ctx.moveTo(data.start, data.start);
+            data.ctx.lineWidth = data.lineWidth;
+            data.ctx.moveTo(data.start.x, data.start.y);
             for (var i = 0; i < arrData.length; i++) {
                 data.ctx.quadraticCurveTo(data[arrData[i]].coordinatesCurrent.controlX, data[arrData[i]].coordinatesCurrent.controlY, data[arrData[i]].endX, data[arrData[i]].endY);
             }
-            data.ctx.strokeStyle = "black";
+            data.ctx.strokeStyle = data.strokeStyle;
             data.ctx.stroke();
             data.ctx.fillStyle = pattern;
             data.ctx.fill();
-            data.timeoutWrite = setImmediate(data.write);
-            data.fit();
+            setImmediate(data.fit);
+            if (data.activeTimeoutWrite) {
+                data.timeoutWrite = setImmediate(data.write);
+            } else {
+                if (checkDovodchik()) {
+                    data.timeoutWrite = setImmediate(data.write);
+                }
+            }
         }
 
         function fit() {
             var arrData = data.arrData;
             var fitChunk = data.fitChunk;
-            data.active = false;
             for (var i = 0; i < arrData.length; i++) {
                 var currentX = data[arrData[i]].coordinatesCurrent.controlX;
                 var currentY = data[arrData[i]].coordinatesCurrent.controlY;
-                var ambitionX = data[arrData[i]].coordinatesAmbition.controlX;
-                var ambitionY = data[arrData[i]].coordinatesAmbition.controlY;
+                var ambitionX = void 0;
+                var ambitionY = void 0;
+                if (data[arrData[i]].dovodchick || !data.activeTimeoutWrite) {
+                    ambitionX = data[arrData[i]].controlX;
+                    ambitionY = data[arrData[i]].controlY;
+                } else {
+                    ambitionX = data[arrData[i]].coordinatesAmbition.controlX;
+                    ambitionY = data[arrData[i]].coordinatesAmbition.controlY;
+                }
                 if (currentX > ambitionX) {
                     currentX -= fitChunk;
                     if (currentX < ambitionX) {
@@ -11141,9 +11255,6 @@ module.exports = function getDataParam(t, optionsMain) {
                 }
                 data[arrData[i]].coordinatesCurrent.controlX = currentX;
                 data[arrData[i]].coordinatesCurrent.controlY = currentY;
-                if (currentX !== ambitionX || currentY !== ambitionY) {
-                    data.active = true;
-                }
             }
         }
 
@@ -11160,21 +11271,33 @@ module.exports = function getDataParam(t, optionsMain) {
                 console.log("Верх");
                 data.top.coordinatesAmbition.controlX = x;
                 data.top.coordinatesAmbition.controlY = y;
+                data.top.dovodchick = false;
+            } else {
+                data.top.dovodchick = true;
             }
             if (x >= canvas.width - 2 * offset && y >= offset && y <= canvas.height - offset) {
                 console.log("Право");
                 data.right.coordinatesAmbition.controlX = x;
                 data.right.coordinatesAmbition.controlY = y;
+                data.right.dovodchick = false;
+            } else {
+                data.right.dovodchick = true;
             }
             if (x >= offset && x <= canvas.width - offset && y >= canvas.height - 2 * offset) {
                 console.log("Низ");
                 data.bottom.coordinatesAmbition.controlX = x;
                 data.bottom.coordinatesAmbition.controlY = y;
+                data.bottom.dovodchick = false;
+            } else {
+                data.bottom.dovodchick = true;
             }
-            if (x <= 2 * offset && y >= 100 && y <= canvas.height - offset) {
+            if (x <= 2 * offset && y >= offset && y <= canvas.height - offset) {
                 console.log("Лево");
                 data.left.coordinatesAmbition.controlX = x;
                 data.left.coordinatesAmbition.controlY = y;
+                data.left.dovodchick = false;
+            } else {
+                data.left.dovodchick = true;
             }
         }
         data.write = write;
@@ -11185,87 +11308,36 @@ module.exports = function getDataParam(t, optionsMain) {
         $(t).trigger('curvedImage.readyMaker');
     });
 };
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(34).setImmediate))
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
-            (typeof self !== "undefined" && self) ||
-            window;
-var apply = Function.prototype.apply;
-
-// DOM APIs, for completeness
-
-exports.setTimeout = function() {
-  return new Timeout(apply.call(setTimeout, scope, arguments), clearTimeout);
-};
-exports.setInterval = function() {
-  return new Timeout(apply.call(setInterval, scope, arguments), clearInterval);
-};
-exports.clearTimeout =
-exports.clearInterval = function(timeout) {
-  if (timeout) {
-    timeout.close();
-  }
-};
-
-function Timeout(id, clearFn) {
-  this._id = id;
-  this._clearFn = clearFn;
-}
-Timeout.prototype.unref = Timeout.prototype.ref = function() {};
-Timeout.prototype.close = function() {
-  this._clearFn.call(scope, this._id);
-};
-
-// Does not start the time, just sets up the members needed.
-exports.enroll = function(item, msecs) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = msecs;
-};
-
-exports.unenroll = function(item) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = -1;
-};
-
-exports._unrefActive = exports.active = function(item) {
-  clearTimeout(item._idleTimeoutId);
-
-  var msecs = item._idleTimeout;
-  if (msecs >= 0) {
-    item._idleTimeoutId = setTimeout(function onTimeout() {
-      if (item._onTimeout)
-        item._onTimeout();
-    }, msecs);
-  }
-};
-
-// setimmediate attaches itself to the global object
-__webpack_require__(1);
-// On some exotic environments, it's not clear which object `setimmediate` was
-// able to install onto.  Search each possibility in the same order as the
-// `setimmediate` library.
-exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
-                       (typeof global !== "undefined" && global.setImmediate) ||
-                       (this && this.setImmediate);
-exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
-                         (typeof global !== "undefined" && global.clearImmediate) ||
-                         (this && this.clearImmediate);
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3).setImmediate))
 
 /***/ }),
 /* 35 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-module.exports = function binding(t) {
+/* WEBPACK VAR INJECTION */(function(setImmediate) {module.exports = function binding(t) {
     $(t).on("curvedImage.readyMaker", function () {
-        console.log("curvedImage.readyMaker");
+        var data = t.curvedImage.data;
+        $(data.canvas).hover(function () {
+            // data.active = true;
+            data.activeTimeoutWrite = true;
+            console.log('hover', t);
+            $(data.canvas).on('mousemove', function (event) {
+                setImmediate(function () {
+                    data.withard(event);
+                });
+            });
+            setImmediate(data.write);
+        }, function () {
+            $(data.canvas).unbind('mousemove');
+            // data.active = false;
+            data.activeTimeoutWrite = false;
+            console.log('unhover', t);
+            // clearTimeout(data.timeoutWrite);
+            // activeMain = false;
+        });
     });
 };
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3).setImmediate))
 
 /***/ })
 /******/ ]);
